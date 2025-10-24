@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   computeAddons,
   computeBase,
+  computeDeposit,
   computeNocturneExtra,
   computeTotal,
   computeUnderMinimumPenalty,
@@ -109,6 +110,34 @@ describe("computeTotal", () => {
         addons: -1,
       })
     ).toThrow(/addons cannot be negative/);
+  });
+});
+
+describe("computeDeposit", () => {
+  it("returns zero when no deposit is configured", () => {
+    expect(computeDeposit(20000, { type: "NONE" })).toBe(0);
+  });
+
+  it("returns the fixed amount for fixed deposits", () => {
+    expect(computeDeposit(15000, { type: "FIXED", amountCents: 5000 })).toBe(5000);
+  });
+
+  it("computes a percentage when Stripe is enabled", () => {
+    expect(
+      computeDeposit(20000, { type: "PERCENT", percent: 25, stripeEnabled: true })
+    ).toBe(5000);
+  });
+
+  it("ignores percentage deposits when Stripe is disabled", () => {
+    expect(
+      computeDeposit(20000, { type: "PERCENT", percent: 50, stripeEnabled: false })
+    ).toBe(0);
+  });
+
+  it("throws when percentage exceeds 100", () => {
+    expect(() =>
+      computeDeposit(10000, { type: "PERCENT", percent: 150, stripeEnabled: true })
+    ).toThrow(/percent cannot exceed 100/);
   });
 });
 
