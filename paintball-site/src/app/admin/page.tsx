@@ -42,6 +42,19 @@ type BookingAssignment = {
   animator: Animator;
 };
 
+type BookingAddon = {
+  addon: {
+    id: string;
+    name: string;
+  };
+  quantity: number;
+};
+
+type BookingResource = {
+  id: string;
+  name: string;
+} | null;
+
 type BookingPackage = {
   id: string;
   name: string;
@@ -58,6 +71,8 @@ type BookingResponse = {
   nocturne: boolean;
   package: BookingPackage;
   assignments: BookingAssignment[];
+  resource: BookingResource;
+  bookingAddons: BookingAddon[];
 };
 
 type BookingWithDates = Omit<BookingResponse, "dateTimeStart" | "dateTimeEnd"> & {
