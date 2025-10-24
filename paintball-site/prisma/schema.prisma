@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -14,49 +7,120 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  passwordHash  String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+  id        String   @id @default(cuid())
+  name      String?
+  email     String?  @unique
+  phone     String?
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  bookings  Booking[]
 }
 
-model Account {
-  id                 String   @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @map("refresh_token")
-  access_token       String?  @map("access_token")
-  expires_at         Int?     @map("expires_at")
-  token_type         String?  @map("token_type")
-  scope              String?
-  id_token           String?  @map("id_token")
-  session_state      String?  @map("session_state")
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  bookings  Booking[]
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Animator {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  assignments Assignment[]
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model Package {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  priceCents    Int
+  includedBalls Int?
+  durationMin   Int
+  isPromo       Boolean  @default(false)
+  isPublic      Boolean  @default(true)
+  bookings      Booking[]
+}
 
-  @@unique([identifier, token])
+model Addon {
+  id            String  @id @default(cuid())
+  name          String
+  priceCents    Int
+  bookingAddons BookingAddon[]
+}
+
+model Resource {
+  id        String   @id @default(cuid())
+  name      String
+  capacity  Int      @default(1)
+  createdAt DateTime @default(now())
+  bookings  Booking[]
+}
+
+model Booking {
+  id             String         @id @default(cuid())
+  dateTimeStart  DateTime
+  dateTimeEnd    DateTime
+  groupSize      Int
+  customerName   String
+  customerPhone  String?
+  customerEmail  String?
+  notes          String?
+  status         BookingStatus  @default(PENDING)
+  depositCents   Int?
+  nocturne       Boolean        @default(false)
+
+  packageId      String
+  package        Package        @relation(fields: [packageId], references: [id])
+
+  clientId       String?
+  client         Client?        @relation(fields: [clientId], references: [id])
+
+  resourceId     String?
+  resource       Resource?      @relation(fields: [resourceId], references: [id])
+
+  userId         String?
+  user           User?          @relation(fields: [userId], references: [id])
+
+  createdAt      DateTime       @default(now())
+  bookingAddons  BookingAddon[]
+  assignments    Assignment[]
+
+  @@index([dateTimeStart])
+}
+
+model BookingAddon {
+  bookingId String
+  addonId   String
+  quantity  Int      @default(1)
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  addon     Addon    @relation(fields: [addonId], references: [id])
+  @@id([bookingId, addonId])
+}
+
+model Assignment {
+  id         String   @id @default(cuid())
+  bookingId  String
+  animatorId String
+  booking    Booking  @relation(fields: [bookingId], references: [id])
+  animator   Animator @relation(fields: [animatorId], references: [id])
 }
