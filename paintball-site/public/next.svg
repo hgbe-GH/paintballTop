@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" role="img" aria-labelledby="title">
+  <title id="title">Next.js Logo Simplified</title>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="40" rx="8" fill="#020817" />
+  <g fill="none" stroke="url(#grad)" stroke-width="6" stroke-linecap="round">
+    <path d="M20 10v20l16-20v20" />
+    <path d="M55 28c7 0 11-4 11-9s-4-9-11-9-11 4-11 9 4 9 11 9z" />
+    <path d="M80 10l20 20" />
+    <path d="M100 10l-8 8" />
+  </g>
+</svg>
