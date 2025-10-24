@@ -25,6 +25,14 @@ const updateBookingSchema = z
       .refine((value) => !Number.isNaN(Date.parse(value)), "startISO must be a valid ISO date")
       .optional(),
     durationMin: z.number().int().positive("durationMin must be a positive integer").optional(),
+    addons: z
+      .array(
+        z.object({
+          addonId: z.string().min(1, "addonId is required"),
+          qty: z.number().int().positive("qty must be a positive integer"),
+        })
+      )
+      .optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
@@ -40,6 +48,9 @@ export async function PATCH(
 
     const booking = await prisma.booking.findUnique({
       where: { id: params.id },
+      include: {
+        bookingAddons: true,
+      },
     });
 
     if (!booking) {
@@ -51,8 +62,23 @@ export async function PATCH(
       1,
       Math.round((booking.dateTimeEnd.getTime() - booking.dateTimeStart.getTime()) / MINUTES_IN_MS)
     );
-    const effectiveDuration = updates.durationMin ?? existingDurationMin;
-    const endDate = new Date(startDate.getTime() + effectiveDuration * MINUTES_IN_MS);
+    const packageIdForDuration = updates.packageId ?? booking.packageId;
+    let resolvedDuration = updates.durationMin ?? existingDurationMin;
+
+    if (updates.durationMin === undefined && updates.packageId) {
+      const packageData = await prisma.package.findUnique({
+        where: { id: packageIdForDuration },
+        select: { durationMin: true },
+      });
+
+      if (!packageData) {
+        return NextResponse.json({ error: "Package not found" }, { status: 404 });
+      }
+
+      resolvedDuration = packageData.durationMin;
+    }
+
+    const endDate = new Date(startDate.getTime() + resolvedDuration * MINUTES_IN_MS);
     const resourceId =
       updates.resourceId === undefined ? booking.resourceId : updates.resourceId ?? null;
 
@@ -131,9 +157,63 @@ export async function PATCH(
       data.resourceId = resourceId;
     }
 
-    const updatedBooking = await prisma.booking.update({
-      where: { id: params.id },
-      data,
+    const updatedBooking = await prisma.$transaction(async (tx) => {
+      const bookingResult = await tx.booking.update({
+        where: { id: params.id },
+        data,
+        include: {
+          package: true,
+          resource: true,
+          bookingAddons: {
+            include: {
+              addon: true,
+            },
+          },
+          assignments: {
+            include: {
+              animator: true,
+            },
+          },
+        },
+      });
+
+      if (updates.addons !== undefined) {
+        await tx.bookingAddon.deleteMany({ where: { bookingId: params.id } });
+
+        if (updates.addons.length > 0) {
+          await tx.bookingAddon.createMany({
+            data: updates.addons.map((addon) => ({
+              bookingId: params.id,
+              addonId: addon.addonId,
+              quantity: addon.qty,
+            })),
+          });
+        }
+
+        const refreshedBooking = await tx.booking.findUnique({
+          where: { id: params.id },
+          include: {
+            package: true,
+            resource: true,
+            bookingAddons: {
+              include: {
+                addon: true,
+              },
+            },
+            assignments: {
+              include: {
+                animator: true,
+              },
+            },
+          },
+        });
+
+        if (refreshedBooking) {
+          return refreshedBooking;
+        }
+      }
+
+      return bookingResult;
     });
 
     return NextResponse.json(updatedBooking);

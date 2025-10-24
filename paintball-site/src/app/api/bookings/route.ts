@@ -62,9 +62,15 @@ export async function GET(request: Request) {
       },
       include: {
         package: true,
+        resource: true,
         assignments: {
           include: {
             animator: true,
+          },
+        },
+        bookingAddons: {
+          include: {
+            addon: true,
           },
         },
       },
