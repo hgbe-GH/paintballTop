@@ -1,0 +1,21 @@
+export function SiteFooter() {
+  return (
+    <footer
+      id="contact"
+      className="border-t border-border/60 bg-gradient-to-br from-background to-muted/60"
+    >
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 text-xs uppercase tracking-[0.3em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="space-y-2">
+          <p className="font-heading text-sm text-foreground">
+            Paintball Méditerranée
+          </p>
+          <p>Route des Pins, 13000 Marseille</p>
+        </div>
+        <div className="space-y-2 text-right">
+          <p className="text-muted-foreground">contact@paintball-med.com</p>
+          <p className="text-muted-foreground">+33 4 42 00 00 00</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
