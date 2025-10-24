@@ -167,3 +167,23 @@ model Assignment {
 
   @@unique([bookingId, animatorId])
 }
+
+enum DepositType {
+  NONE
+  FIXED
+  PERCENT
+}
+
+model Settings {
+  id                    String      @id @default("global")
+  nocturneThreshold     Int         @default(20)
+  minPlayers            Int         @default(8)
+  penaltyUnderMinCents  Int         @default(2500)
+  openingHours          Json
+  stripeEnabled         Boolean     @default(false)
+  depositType           DepositType @default(NONE)
+  depositFixedCents     Int?
+  depositPercent        Int?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}

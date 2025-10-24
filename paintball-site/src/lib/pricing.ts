@@ -138,3 +138,36 @@ export function computeTotal({
   return base + addons + nocturneExtra + underMinPenalty;
 }
 
+export type DepositConfig =
+  | { type: "NONE" }
+  | { type: "FIXED"; amountCents: number }
+  | { type: "PERCENT"; percent: number; stripeEnabled: boolean };
+
+export function computeDeposit(totalCents: number, config: DepositConfig): number {
+  assertFiniteNumber(totalCents, "totalCents");
+  assertNonNegative(totalCents, "totalCents");
+
+  if (config.type === "NONE") {
+    return 0;
+  }
+
+  if (config.type === "FIXED") {
+    assertFiniteNumber(config.amountCents, "amountCents");
+    assertNonNegative(config.amountCents, "amountCents");
+    return Math.round(config.amountCents);
+  }
+
+  assertFiniteNumber(config.percent, "percent");
+  assertNonNegative(config.percent, "percent");
+
+  if (config.percent > 100) {
+    throw new Error("percent cannot exceed 100");
+  }
+
+  if (!config.stripeEnabled) {
+    return 0;
+  }
+
+  return Math.round((totalCents * config.percent) / 100);
+}
+
