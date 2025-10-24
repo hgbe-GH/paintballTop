@@ -164,4 +164,6 @@ model Assignment {
   animatorId String
   booking    Booking  @relation(fields: [bookingId], references: [id])
   animator   Animator @relation(fields: [animatorId], references: [id])
+
+  @@unique([bookingId, animatorId])
 }
