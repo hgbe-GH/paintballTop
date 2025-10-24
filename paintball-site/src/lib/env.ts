@@ -9,6 +9,8 @@ const envSchema = z.object({
   EMAIL_SERVER_USER: z.string().optional(),
   EMAIL_SERVER_PASSWORD: z.string().optional(),
   EMAIL_FROM: z.string().min(1).default("Paintball Méditerranée <noreply@paintball.local>"),
+  GOOGLE_SHEETS_ID: z.string().optional(),
+  GOOGLE_SERVICE_ACCOUNT_JSON: z.string().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;
@@ -29,6 +31,8 @@ export function getEnv(): Env {
     EMAIL_SERVER_USER: process.env.EMAIL_SERVER_USER,
     EMAIL_SERVER_PASSWORD: process.env.EMAIL_SERVER_PASSWORD,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    GOOGLE_SHEETS_ID: process.env.GOOGLE_SHEETS_ID,
+    GOOGLE_SERVICE_ACCOUNT_JSON: process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
   });
 
   if (!parsed.success) {

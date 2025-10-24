@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { prisma } from "@/lib/prisma";
+import { syncBookingWithSheets } from "@/lib/integrations/googleSheets";
 import { isNocturne } from "@/lib/slots";
 
 const MINUTES_IN_MS = 60_000;
@@ -215,6 +216,8 @@ export async function PATCH(
 
       return bookingResult;
     });
+
+    void syncBookingWithSheets(updatedBooking.id);
 
     return NextResponse.json(updatedBooking);
   } catch (error) {

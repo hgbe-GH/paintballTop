@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
@@ -127,6 +128,10 @@ export default function AdminPage() {
     submitting: false,
   });
   const [draggedBookingId, setDraggedBookingId] = useState<string | null>(null);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportFrom, setExportFrom] = useState("");
+  const [exportTo, setExportTo] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const range = useMemo(() => {
     const start =
@@ -444,6 +449,73 @@ export default function AdminPage() {
     }
   }, [assignmentDialog, resetAssignmentDialog]);
 
+  const openExportDialog = useCallback(() => {
+    setExportFrom(format(range.start, "yyyy-MM-dd"));
+    setExportTo(format(range.end, "yyyy-MM-dd"));
+    setExportDialogOpen(true);
+  }, [range.end, range.start]);
+
+  const handleExportPeriod = useCallback(async () => {
+    if (!exportFrom || !exportTo) {
+      toast.error("Veuillez sélectionner une période valide.");
+      return;
+    }
+
+    const fromDate = new Date(exportFrom);
+    const toDate = new Date(exportTo);
+
+    fromDate.setUTCHours(0, 0, 0, 0);
+    toDate.setUTCHours(23, 59, 59, 999);
+
+    if (fromDate.getTime() > toDate.getTime()) {
+      toast.error("La date de début doit précéder la date de fin.");
+      return;
+    }
+
+    setExporting(true);
+
+    try {
+      const response = await fetch("/api/integrations/sheets/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: fromDate.toISOString(),
+          to: toDate.toISOString(),
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        const message =
+          payload?.error?.message ??
+          payload?.error ??
+          "Impossible d'exporter la période sélectionnée.";
+        toast.error(message);
+        return;
+      }
+
+      const bookingsExported = payload?.bookingsAppended ?? 0;
+      const clientUpdates = payload?.clients ?? { updated: 0, appended: 0 };
+      toast.success(
+        `Export terminé : ${bookingsExported} réservation(s), ${
+          clientUpdates.updated + clientUpdates.appended
+        } fiche(s) client synchronisée(s).`
+      );
+      setExportDialogOpen(false);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Impossible d'exporter la période sélectionnée.";
+      toast.error(message);
+    } finally {
+      setExporting(false);
+    }
+  }, [exportFrom, exportTo]);
+
   const goToToday = useCallback(() => {
     setCurrentDate(new Date());
   }, []);
@@ -500,6 +572,12 @@ export default function AdminPage() {
           </Button>
           <Button variant="ghost" onClick={goToToday}>
             Aujourd’hui
+          </Button>
+        </div>
+
+        <div>
+          <Button variant="secondary" onClick={openExportDialog}>
+            Exporter la période
           </Button>
         </div>
       </div>
@@ -627,6 +705,49 @@ export default function AdminPage() {
           })}
         </div>
       </div>
+
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Exporter la période vers Google Sheets</DialogTitle>
+            <DialogDescription>
+              Sélectionnez une plage de dates pour synchroniser les réservations et les clients
+              sur la feuille de calcul.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-2">
+            <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
+              Date de début
+              <Input
+                type="date"
+                value={exportFrom}
+                onChange={(event) => setExportFrom(event.target.value)}
+                disabled={exporting}
+              />
+            </label>
+
+            <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
+              Date de fin
+              <Input
+                type="date"
+                value={exportTo}
+                onChange={(event) => setExportTo(event.target.value)}
+                disabled={exporting}
+              />
+            </label>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="ghost" onClick={() => setExportDialogOpen(false)} disabled={exporting}>
+              Annuler
+            </Button>
+            <Button onClick={() => void handleExportPeriod()} disabled={exporting}>
+              {exporting ? "Export en cours…" : "Exporter"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={assignmentDialog.open}
