@@ -1,4 +1,4 @@
-import { BookingStatus } from "@prisma/client";
+import { BookingStatus, Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -15,86 +15,146 @@ const addonSchema = z.object({
 const createBookingSchema = z.object({
   packageId: z.string().min(1, "packageId is required"),
   groupSize: z.number().int().positive("groupSize must be a positive integer"),
-  customerName: z.string().min(1, "customerName is required"),
-  customerEmail: z.string().email("customerEmail must be a valid email").optional(),
-  customerPhone: z.string().optional(),
-  notes: z.string().optional(),
-  depositCents: z.number().int().nonnegative().optional().nullable(),
-  status: z.nativeEnum(BookingStatus).optional(),
-  clientId: z.string().min(1, "clientId cannot be empty").nullable().optional(),
-  userId: z.string().min(1, "userId cannot be empty").nullable().optional(),
-  resourceId: z.string().min(1, "resourceId cannot be empty").nullable().optional(),
   startISO: z
     .string()
     .refine((value) => !Number.isNaN(Date.parse(value)), "startISO must be a valid ISO date"),
-  durationMin: z.number().int().positive("durationMin must be a positive integer"),
+  notes: z.string().optional(),
+  resourceId: z.string().min(1, "resourceId cannot be empty").optional(),
+  customer: z.object({
+    name: z.string().min(1, "customer.name is required"),
+    email: z.string().email("customer.email must be a valid email").optional(),
+    phone: z.string().optional(),
+  }),
   addons: z.array(addonSchema).optional().default([]),
 });
+
+const DEFAULT_RESOURCE_NAME = "Terrain A";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const {
-      packageId,
-      groupSize,
-      customerName,
-      customerEmail,
-      customerPhone,
-      notes,
-      depositCents,
-      status,
-      clientId,
-      userId,
-      resourceId,
-      startISO,
-      durationMin,
-      addons,
-    } = createBookingSchema.parse(body);
+    const { packageId, groupSize, startISO, notes, resourceId, customer, addons } =
+      createBookingSchema.parse(body);
+
+    const packageData = await prisma.package.findUnique({
+      where: { id: packageId },
+      select: { durationMin: true },
+    });
+
+    if (!packageData) {
+      return NextResponse.json(
+        { error: "Offre introuvable." },
+        { status: 404 }
+      );
+    }
 
     const startDate = new Date(startISO);
-    const endDate = new Date(startDate.getTime() + durationMin * MINUTES_IN_MS);
+    const endDate = new Date(startDate.getTime() + packageData.durationMin * MINUTES_IN_MS);
 
-    if (resourceId) {
-      const conflictingBooking = await prisma.booking.findFirst({
-        where: {
-          resourceId,
-          status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
-          dateTimeStart: { lt: endDate },
-          dateTimeEnd: { gt: startDate },
-        },
-        select: {
-          id: true,
-          dateTimeStart: true,
-          dateTimeEnd: true,
-        },
+    let resolvedResourceId: string;
+    if (!resourceId) {
+      const defaultResource = await prisma.resource.findFirst({
+        where: { name: DEFAULT_RESOURCE_NAME },
+        select: { id: true },
       });
 
-      if (conflictingBooking) {
+      if (!defaultResource) {
         return NextResponse.json(
-          {
-            error: "Ressource indisponible sur ce créneau.",
-            details: {
-              conflictBookingId: conflictingBooking.id,
-            },
-          },
-          { status: 409 }
+          { error: "Ressource par défaut introuvable." },
+          { status: 500 }
         );
       }
+
+      resolvedResourceId = defaultResource.id;
+    } else {
+      const existingResource = await prisma.resource.findUnique({
+        where: { id: resourceId },
+        select: { id: true },
+      });
+
+      if (!existingResource) {
+        return NextResponse.json(
+          { error: "Ressource sélectionnée introuvable." },
+          { status: 404 }
+        );
+      }
+
+      resolvedResourceId = resourceId;
+    }
+
+    const conflictingBooking = await prisma.booking.findFirst({
+      where: {
+        resourceId: resolvedResourceId,
+        status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
+        dateTimeStart: { lt: endDate },
+        dateTimeEnd: { gt: startDate },
+      },
+      select: {
+        id: true,
+        dateTimeStart: true,
+        dateTimeEnd: true,
+      },
+    });
+
+    if (conflictingBooking) {
+      return NextResponse.json(
+        {
+          error: "Ressource indisponible sur ce créneau.",
+          details: {
+            conflictBookingId: conflictingBooking.id,
+          },
+        },
+        { status: 409 }
+      );
+    }
+
+    const clientSearchConditions: Prisma.ClientWhereInput[] = [];
+    if (customer.email) {
+      clientSearchConditions.push({ email: customer.email });
+    }
+    if (customer.phone) {
+      clientSearchConditions.push({ phone: customer.phone });
+    }
+
+    type ClientEntity = Awaited<ReturnType<typeof prisma.client.findFirst>>;
+    let client: ClientEntity = null;
+
+    if (clientSearchConditions.length > 0) {
+      client = await prisma.client.findFirst({
+        where: { OR: clientSearchConditions },
+      });
+    }
+
+    if (client) {
+      client = await prisma.client.update({
+        where: { id: client.id },
+        data: {
+          name: customer.name,
+          email: customer.email ?? client.email,
+          phone: customer.phone ?? client.phone,
+        },
+      });
+    } else {
+      client = await prisma.client.create({
+        data: {
+          name: customer.name,
+          email: customer.email ?? null,
+          phone: customer.phone ?? null,
+        },
+      });
     }
 
     const booking = await prisma.booking.create({
       data: {
         packageId,
         groupSize,
-        customerName,
-        customerEmail: customerEmail ?? null,
-        customerPhone: customerPhone ?? null,
+        customerName: customer.name,
+        customerEmail: customer.email ?? null,
+        customerPhone: customer.phone ?? null,
         notes: notes ?? null,
-        depositCents: depositCents ?? null,
-        status: status ?? BookingStatus.PENDING,
-        clientId: clientId ?? null,
-        userId: userId ?? null,
-        resourceId: resourceId ?? null,
+        status: BookingStatus.PENDING,
+        clientId: client?.id ?? null,
+        resourceId: resolvedResourceId,
         dateTimeStart: startDate,
         dateTimeEnd: endDate,
         nocturne: isNocturne(startISO),
@@ -106,6 +166,9 @@ export async function POST(request: Request) {
       },
       include: {
         bookingAddons: true,
+        client: true,
+        resource: true,
+        package: true,
       },
     });
 
