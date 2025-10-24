@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -27,10 +27,38 @@ const credentialsSchema = z.object({
 type CredentialsFormValues = z.infer<typeof credentialsSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const errorParam = searchParams.get("error");
-  const [formError, setFormError] = useState<string | null>(null);
+  const callbackUrl = searchParams.get("callbackUrl");
+
+  return (
+    <LoginPageContent
+      key={errorParam ?? "none"}
+      errorParam={errorParam}
+      callbackUrl={callbackUrl}
+    />
+  );
+}
+
+function LoginPageContent({
+  errorParam,
+  callbackUrl,
+}: {
+  errorParam: string | null;
+  callbackUrl: string | null;
+}) {
+  const router = useRouter();
+  const [formError, setFormError] = useState<string | null>(() => {
+    if (!errorParam) {
+      return null;
+    }
+
+    if (errorParam === "CredentialsSignin") {
+      return "Identifiants incorrects";
+    }
+
+    return "Une erreur est survenue lors de la connexion";
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CredentialsFormValues>({
@@ -41,31 +69,16 @@ export default function LoginPage() {
     },
   });
 
-  useEffect(() => {
-    if (!errorParam) {
-      setFormError(null);
-      return;
-    }
-
-    switch (errorParam) {
-      case "CredentialsSignin":
-        setFormError("Identifiants incorrects");
-        break;
-      default:
-        setFormError("Une erreur est survenue lors de la connexion");
-    }
-  }, [errorParam]);
-
   const onSubmit = async (values: CredentialsFormValues) => {
     setFormError(null);
     setIsSubmitting(true);
 
-    const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
+    const targetUrl = callbackUrl ?? "/admin";
 
     const result = await signIn("credentials", {
       ...values,
       redirect: false,
-      callbackUrl,
+      callbackUrl: targetUrl,
     });
 
     setIsSubmitting(false);

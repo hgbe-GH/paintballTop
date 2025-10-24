@@ -30,6 +30,58 @@ const createBookingSchema = z.object({
 
 const DEFAULT_RESOURCE_NAME = "Terrain A";
 
+const bookingsQuerySchema = z
+  .object({
+    from: z
+      .string()
+      .refine((value) => !Number.isNaN(Date.parse(value)), "from must be a valid ISO date"),
+    to: z
+      .string()
+      .refine((value) => !Number.isNaN(Date.parse(value)), "to must be a valid ISO date"),
+  })
+  .refine(
+    (values) => new Date(values.from).getTime() <= new Date(values.to).getTime(),
+    "from must be before to"
+  );
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const parsed = bookingsQuerySchema.parse({
+      from: searchParams.get("from"),
+      to: searchParams.get("to"),
+    });
+
+    const from = new Date(parsed.from);
+    const to = new Date(parsed.to);
+
+    const bookings = await prisma.booking.findMany({
+      where: {
+        dateTimeEnd: { gte: from },
+        dateTimeStart: { lte: to },
+      },
+      include: {
+        package: true,
+        assignments: {
+          include: {
+            animator: true,
+          },
+        },
+      },
+      orderBy: { dateTimeStart: "asc" },
+    });
+
+    return NextResponse.json(bookings);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.flatten() }, { status: 400 });
+    }
+
+    console.error("Error fetching bookings", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
