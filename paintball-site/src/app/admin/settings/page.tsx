@@ -760,7 +760,7 @@ export default function AdminSettingsPage() {
                   disabled={!settingsLoaded || savingRules}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Heure à partir de laquelle le supplément nocturne s'applique.
+                  Heure à partir de laquelle le supplément nocturne s’applique.
                 </p>
               </div>
               <div className="space-y-2">
@@ -780,7 +780,7 @@ export default function AdminSettingsPage() {
                   disabled={!settingsLoaded || savingRules}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Nombre de joueurs requis avant d'appliquer la pénalité.
+                  Nombre de joueurs requis avant d’appliquer la pénalité.
                 </p>
               </div>
               <div className="space-y-2">
@@ -801,13 +801,13 @@ export default function AdminSettingsPage() {
                   disabled={!settingsLoaded || savingRules}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Montant facturé par joueur manquant si le minimum n'est pas atteint.
+                  Montant facturé par joueur manquant si le minimum n’est pas atteint.
                 </p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Horaires d'ouverture</h2>
+              <h2 className="text-lg font-semibold">Horaires d’ouverture</h2>
               <div className="grid gap-3">
                 {DAY_ORDER.map((day) => {
                   const schedule = rulesForm.openingHours[day];
