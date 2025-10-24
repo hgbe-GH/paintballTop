@@ -2,11 +2,19 @@ import { BookingStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
 import { syncBookingWithSheets } from "@/lib/integrations/googleSheets";
+import { prisma } from "@/lib/prisma";
 import { isNocturne } from "@/lib/slots";
+import { buildBookingEmailContext, normalizeRecipient } from "@/server/email/bookings";
+import { bookingConfirmation } from "@/server/email/templates";
+import { sendMail } from "@/server/email/transport";
 
 const MINUTES_IN_MS = 60_000;
+const NOTIFIABLE_STATUSES: BookingStatus[] = [
+  BookingStatus.CONFIRMED,
+  BookingStatus.ANNULLED,
+  BookingStatus.COMPLETED,
+];
 
 const updateBookingSchema = z
   .object({
@@ -218,6 +226,43 @@ export async function PATCH(
     });
 
     void syncBookingWithSheets(updatedBooking.id);
+
+    const statusChangedToNotifiable =
+      updates.status !== undefined &&
+      updates.status !== booking.status &&
+      NOTIFIABLE_STATUSES.includes(updates.status);
+
+    const customerRecipient = normalizeRecipient(updatedBooking.customerEmail);
+
+    if (statusChangedToNotifiable && customerRecipient) {
+      try {
+        const emailContext = await buildBookingEmailContext(updatedBooking);
+        const confirmation = bookingConfirmation({
+          booking: updatedBooking,
+          totalCents: emailContext.totalCents,
+          mapUrl: emailContext.mapUrl,
+          wazeUrl: emailContext.wazeUrl,
+        });
+
+        const subjectParts = confirmation.subject.split(" - ");
+        const suffix = subjectParts.length > 1 ? subjectParts.slice(1).join(" - ") : "";
+        const updateSubject = suffix
+          ? `Mise à jour de votre réservation - ${suffix}`
+          : "Mise à jour de votre réservation";
+
+        await sendMail({
+          to: customerRecipient,
+          subject: updateSubject,
+          html: confirmation.html,
+          text: confirmation.text,
+        });
+      } catch (emailError) {
+        console.error(
+          `Failed to send booking status update email for booking ${updatedBooking.id}`,
+          emailError
+        );
+      }
+    }
 
     return NextResponse.json(updatedBooking);
   } catch (error) {

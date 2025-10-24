@@ -2,9 +2,12 @@ import { BookingStatus, Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
 import { syncBookingWithSheets } from "@/lib/integrations/googleSheets";
+import { prisma } from "@/lib/prisma";
 import { isNocturne } from "@/lib/slots";
+import { buildBookingEmailContext, normalizeRecipient } from "@/server/email/bookings";
+import { adminNewBookingAlert, bookingConfirmation } from "@/server/email/templates";
+import { sendMail } from "@/server/email/transport";
 
 const MINUTES_IN_MS = 60_000;
 
@@ -224,7 +227,11 @@ export async function POST(request: Request) {
           : undefined,
       },
       include: {
-        bookingAddons: true,
+        bookingAddons: {
+          include: {
+            addon: true,
+          },
+        },
         client: true,
         resource: true,
         package: true,
@@ -232,6 +239,55 @@ export async function POST(request: Request) {
     });
 
     void syncBookingWithSheets(booking.id);
+
+    const customerRecipient = normalizeRecipient(booking.customerEmail);
+    const adminRecipient =
+      normalizeRecipient(process.env.MAIL_ADMIN) ?? normalizeRecipient(process.env.MAIL_FROM);
+
+    if (customerRecipient || adminRecipient) {
+      const emailContext = await buildBookingEmailContext(booking);
+
+      if (customerRecipient) {
+        try {
+          const confirmation = bookingConfirmation({
+            booking,
+            totalCents: emailContext.totalCents,
+            mapUrl: emailContext.mapUrl,
+            wazeUrl: emailContext.wazeUrl,
+          });
+
+          await sendMail({
+            to: customerRecipient,
+            subject: confirmation.subject,
+            html: confirmation.html,
+            text: confirmation.text,
+          });
+        } catch (emailError) {
+          console.error(
+            `Failed to send booking confirmation email for booking ${booking.id}`,
+            emailError
+          );
+        }
+      }
+
+      if (adminRecipient) {
+        try {
+          const adminAlert = adminNewBookingAlert({
+            booking,
+            totalCents: emailContext.totalCents,
+          });
+
+          await sendMail({
+            to: adminRecipient,
+            subject: adminAlert.subject,
+            html: adminAlert.html,
+            text: adminAlert.text,
+          });
+        } catch (emailError) {
+          console.error(`Failed to send admin booking alert for booking ${booking.id}`, emailError);
+        }
+      }
+    }
 
     return NextResponse.json(booking, { status: 201 });
   } catch (error) {
