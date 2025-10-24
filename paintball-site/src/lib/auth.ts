@@ -1,11 +1,11 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import EmailProvider from "next-auth/providers/email";
 import { compare } from "bcryptjs";
+import { z } from "zod";
+import type { Role } from "@/generated/prisma/client";
 import { getEnv } from "./env";
 import { prisma } from "./prisma";
-import { z } from "zod";
 
 const credentialsSchema = z.object({
   email: z.string().email({ message: "Adresse email invalide" }),
@@ -16,39 +16,17 @@ const credentialsSchema = z.object({
 
 const env = getEnv();
 
-const emailProvider = EmailProvider({
-  from: env.EMAIL_FROM,
-  maxAge: 60 * 60, // 1 hour
-  sendVerificationRequest: async ({ identifier, url }) => {
-    // In development, log the magic link so testers can inspect it quickly.
-    if (process.env.NODE_ENV !== "production") {
-      console.info(`Magic link pour ${identifier}: ${url}`);
-    }
-  },
-});
-
-if (env.EMAIL_SERVER_HOST && env.EMAIL_SERVER_PORT) {
-  emailProvider.server = {
-    host: env.EMAIL_SERVER_HOST,
-    port: env.EMAIL_SERVER_PORT,
-    auth:
-      env.EMAIL_SERVER_USER && env.EMAIL_SERVER_PASSWORD
-        ? {
-            user: env.EMAIL_SERVER_USER,
-            pass: env.EMAIL_SERVER_PASSWORD,
-          }
-        : undefined,
-  };
-}
-
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: env.NEXTAUTH_SECRET,
   session: {
-    strategy: "database",
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/login",
+    signOut: "/logout",
   },
   providers: [
-    emailProvider,
     CredentialsProvider({
       name: "Connexion",
       credentials: {
@@ -65,6 +43,14 @@ export const authOptions: NextAuthOptions = {
         const { email, password } = parsed.data;
         const user = await prisma.user.findUnique({
           where: { email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            image: true,
+            passwordHash: true,
+            role: true,
+          },
         });
 
         if (!user || !user.passwordHash) {
@@ -82,18 +68,49 @@ export const authOptions: NextAuthOptions = {
           email: user.email ?? undefined,
           name: user.name ?? undefined,
           image: user.image ?? undefined,
+          role: user.role,
+        } satisfies {
+          id: string;
+          email?: string;
+          name?: string;
+          image?: string;
+          role: Role;
         };
       },
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      if (session.user && user) {
-        session.user.id = user.id;
-        session.user.name = user.name ?? session.user.name;
+    async session({ session, token }) {
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
+        if (token.role) {
+          session.user.role = token.role as Role;
+        }
+        if (token.name && !session.user.name) {
+          session.user.name = token.name;
+        }
+        if (token.email && !session.user.email) {
+          session.user.email = token.email;
+        }
       }
 
       return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = (user as { role?: Role }).role ?? token.role;
+      } else if (!token.role && token.sub) {
+        const existingUser = await prisma.user.findUnique({
+          where: { id: token.sub },
+          select: { role: true },
+        });
+
+        if (existingUser) {
+          token.role = existingUser.role;
+        }
+      }
+
+      return token;
     },
   },
   theme: {

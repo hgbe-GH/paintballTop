@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { hash } from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -13,7 +14,8 @@ async function main() {
       { name: 'Tout public (dès 8 ans)', priceCents: 1800, includedBalls: 120, durationMin: 90 },
       { name: 'Link Ranger - Paintball', priceCents: 1800, includedBalls: 120, durationMin: 90 },
       { name: 'Link Ranger - Orbeez', priceCents: 1800, includedBalls: 1600, durationMin: 60 }
-    ]
+    ],
+    skipDuplicates: true,
   })
 
   await prisma.addon.createMany({
@@ -23,11 +25,34 @@ async function main() {
       { name: 'Gants coqués', priceCents: 250 },
       { name: 'Costume de lapin', priceCents: 2500 },
       { name: 'Nocturne (>=20h) /pers', priceCents: 400 }
-    ]
+    ],
+    skipDuplicates: true,
   })
 
-  await prisma.resource.create({
-    data: { name: 'Terrain A', capacity: 1 }
+  const existingResource = await prisma.resource.findFirst({
+    where: { name: 'Terrain A' }
+  })
+
+  if (!existingResource) {
+    await prisma.resource.create({
+      data: { name: 'Terrain A', capacity: 1 }
+    })
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@paintball.test'
+  const adminPassword = process.env.ADMIN_PASSWORD ?? 'paintball123'
+
+  const passwordHash = await hash(adminPassword, 12)
+
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      name: 'Administrateur',
+      role: 'ADMIN',
+      passwordHash,
+    },
   })
 }
 
