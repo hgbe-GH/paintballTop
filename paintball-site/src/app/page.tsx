@@ -7,6 +7,7 @@ import { MapSection } from "@/components/shared/map-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
+import { contactDetails } from "@/lib/contact";
 
 type PackageCard = {
   id: string;
@@ -76,7 +77,7 @@ export default async function Home() {
     }),
   ]);
 
-  const depositUrl = process.env.NEXT_PUBLIC_DEPOSIT_URL;
+  const depositUrl = contactDetails.depositUrl;
 
   return (
     <div className="space-y-16 pb-20">
@@ -265,7 +266,7 @@ export default async function Home() {
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-4 text-sm text-muted-foreground">
                 <p>
-                  <span className="font-semibold text-foreground">Téléphone :</span> +33 4 42 00 00 00
+                  <span className="font-semibold text-foreground">Téléphone :</span> {contactDetails.phoneDisplay}
                 </p>
                 <p>
                   <span className="font-semibold text-foreground">Adresse :</span> Route des Pins — Domaine Chez Paulette
