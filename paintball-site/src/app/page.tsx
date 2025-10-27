@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AvailabilityWidget } from "@/components/shared/availability-widget";
 import { ExperienceOverview } from "@/components/shared/experience-overview";
 import { Hero } from "@/components/shared/hero";
+import { MapSection } from "@/components/shared/map-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
@@ -254,6 +255,8 @@ export default async function Home() {
       </section>
 
       <AvailabilityWidget />
+
+      <MapSection />
 
       <section className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6">
         <div className="rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl sm:p-12">
