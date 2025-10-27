@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 
 const bookingQuoteSchema = z.object({
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
 
     const totalCents = base + addonsTotal + nocturneExtra + underMinPenalty;
 
-    return NextResponse.json({
+    const responseBody = {
       totalCents,
       nocturne,
       endISO: endDate.toISOString(),
@@ -71,13 +72,24 @@ export async function POST(request: Request) {
         nocturneExtra,
         underMinPenalty,
       },
+    };
+
+    void logger.info("[BOOKING]", "Generated booking quote", {
+      packageId,
+      groupSize,
+      totalCents,
+      nocturne,
     });
+
+    return NextResponse.json(responseBody);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
 
-    console.error("Error generating booking quote", error);
+    await logger.error("[BOOKING]", "Error generating booking quote", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

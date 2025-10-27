@@ -2,6 +2,7 @@ import { BookingStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 
 const createAssignmentSchema = z.object({
@@ -10,9 +11,12 @@ const createAssignmentSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  let bookingId: string | undefined;
+  let animatorId: string | undefined;
+
   try {
     const body = await request.json();
-    const { bookingId, animatorId } = createAssignmentSchema.parse(body);
+    ({ bookingId, animatorId } = createAssignmentSchema.parse(body));
 
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
@@ -25,6 +29,9 @@ export async function POST(request: Request) {
     });
 
     if (!booking) {
+      await logger.warn("[BOOKING]", "Assignment attempted on missing booking", {
+        bookingId,
+      });
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
@@ -33,6 +40,10 @@ export async function POST(request: Request) {
     });
 
     if (!animator) {
+      await logger.warn("[BOOKING]", "Assignment attempted with missing animator", {
+        bookingId,
+        animatorId,
+      });
       return NextResponse.json({ error: "Animator not found" }, { status: 404 });
     }
 
@@ -42,6 +53,10 @@ export async function POST(request: Request) {
     });
 
     if (existingAssignment) {
+      await logger.warn("[BOOKING]", "Animator already assigned to booking", {
+        bookingId,
+        animatorId,
+      });
       return NextResponse.json(
         { error: "Animator already assigned to this booking" },
         { status: 409 }
@@ -64,6 +79,11 @@ export async function POST(request: Request) {
     });
 
     if (overlappingAssignment) {
+      await logger.warn("[BOOKING]", "Animator assignment overlaps", {
+        bookingId,
+        animatorId,
+        conflictingBookingId: overlappingAssignment.bookingId,
+      });
       return NextResponse.json(
         {
           error: "Animator already assigned on overlapping booking",
@@ -83,13 +103,23 @@ export async function POST(request: Request) {
       },
     });
 
+    void logger.info("[BOOKING]", "Animator assigned to booking", {
+      bookingId,
+      animatorId,
+      assignmentId: assignment.id,
+    });
+
     return NextResponse.json(assignment, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
 
-    console.error("Error creating assignment", error);
+    await logger.error("[BOOKING]", "Error creating assignment", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      bookingId,
+      animatorId,
+    });
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
