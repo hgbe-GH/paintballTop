@@ -40,6 +40,10 @@ Les migrations Prisma ne doivent pas être exécutées pendant la phase de build
 
 Pensez à configurer `DATABASE_URL` pour pointer vers votre base de données managée (Neon, PlanetScale, etc.).
 
+### Sauvegardes et restauration
+
+Planifiez une sauvegarde quotidienne de votre base PostgreSQL via un job externe (cron, worker, CI) en suivant la procédure décrite dans [`docs/deployment/backup-postgres.md`](./backup-postgres.md). Ce guide fournit un script `pg_dump` prêt à l'emploi et détaille les étapes de restauration avec `pg_restore`.
+
 ## 5. Tests continus (optionnel)
 
 Un workflow GitHub Actions est fourni (`.github/workflows/test.yml`). Il exécute les tests (`npm run test`) et l'analyse lint (`npm run lint`) sur chaque pull request. Adaptez ce workflow si vous utilisez un autre système CI.
