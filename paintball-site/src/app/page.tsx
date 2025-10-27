@@ -85,11 +85,13 @@ export default async function Home() {
 
       <section
         id="forfaits"
+        role="region"
+        aria-labelledby="packages-heading"
         className="mx-auto max-w-6xl space-y-8 rounded-3xl border border-border/70 bg-card/70 px-4 py-12 shadow-xl backdrop-blur sm:px-6 lg:px-12"
       >
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-3">
-            <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">
+            <h2 id="packages-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">
               Nos forfaits (jusqu’à 2h)
             </h2>
             <p className="max-w-2xl text-sm text-muted-foreground">
@@ -120,7 +122,7 @@ export default async function Home() {
                     </p>
                   </div>
                   {pkg.isPromo ? (
-                    <Badge className="rounded-full bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-accent-foreground">
+                    <Badge className="rounded-full bg-emerald-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-sm">
                       Promo été
                     </Badge>
                   ) : null}
@@ -150,9 +152,13 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6">
+      <section
+        role="region"
+        aria-labelledby="all-public-heading"
+        className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6"
+      >
         <div className="rounded-3xl border border-dashed border-primary/40 bg-primary/5 p-8 shadow-inner sm:p-12">
-          <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">
+          <h2 id="all-public-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">
             Tout public — 18€/pers dès 8 ans
           </h2>
           <p className="mt-4 text-sm text-muted-foreground sm:text-base">
@@ -180,11 +186,15 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6">
+      <section
+        role="region"
+        aria-labelledby="link-ranger-heading"
+        className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6"
+      >
         <div className="rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl sm:p-12">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-3">
-              <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">Link Ranger</h2>
+              <h2 id="link-ranger-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">Link Ranger</h2>
               <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Deux parcours signature à enchaîner ou à choisir selon vos envies. Défendez le bunker, escorter le VIP et dominez la forêt méditerranéenne.
               </p>
@@ -218,11 +228,15 @@ export default async function Home() {
 
       <ExperienceOverview />
 
-      <section className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6">
+      <section
+        role="region"
+        aria-labelledby="addons-heading"
+        className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6"
+      >
         <div className="rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl sm:p-12">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-2">
-              <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">Options & équipements</h2>
+              <h2 id="addons-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">Options & équipements</h2>
               <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Personnalisez votre session avec nos add-ons : munitions supplémentaires, fumigènes, combinaisons camo… Nous préparons tout avant votre arrivée.
               </p>
@@ -259,10 +273,14 @@ export default async function Home() {
 
       <MapSection />
 
-      <section className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6">
+      <section
+        role="region"
+        aria-labelledby="infos-heading"
+        className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6"
+      >
         <div className="rounded-3xl border border-border/70 bg-card/70 p-8 shadow-xl sm:p-12">
           <div className="space-y-6">
-            <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">Infos pratiques</h2>
+            <h2 id="infos-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">Infos pratiques</h2>
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-4 text-sm text-muted-foreground">
                 <p>
@@ -291,7 +309,7 @@ export default async function Home() {
                   variant="outline"
                   className="w-full rounded-full border-primary/40 px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] sm:w-auto"
                 >
-                  <a href={depositUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={depositUrl} target="_blank" rel="noopener noreferrer" aria-label="Déposer un acompte dans un nouvel onglet">
                     Déposer un acompte
                   </a>
                 </Button>

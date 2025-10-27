@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
@@ -43,13 +44,17 @@ export function Hero() {
   });
 
   return (
-    <section className="relative overflow-hidden">
+    <section
+      role="region"
+      aria-labelledby="hero-heading"
+      className="relative overflow-hidden"
+    >
       <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:py-24">
         <div className="flex-1 space-y-6">
           <Badge variant="outline" className="rounded-full border-primary/60 bg-primary/10 px-4 py-1 text-primary">
             Sport & Outdoor
           </Badge>
-          <h1 className="font-heading text-3xl tracking-[0.4em] text-foreground sm:text-4xl lg:text-5xl">
+          <h1 id="hero-heading" className="font-heading text-3xl tracking-[0.4em] text-foreground sm:text-4xl lg:text-5xl">
             Paintball Méditerranée
           </h1>
           <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
@@ -111,6 +116,7 @@ export function Hero() {
             </Dialog>
             <Button
               variant="outline"
+              type="button"
               className="rounded-full border-dashed border-primary/60 px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary shadow-sm hover:bg-primary/10"
             >
               Télécharger la brochure
@@ -137,6 +143,17 @@ export function Hero() {
         </div>
         <div className="relative flex-1 rounded-3xl border border-border/70 bg-card/60 p-6 shadow-xl backdrop-blur">
           <div className="absolute inset-x-8 -top-8 h-16 rounded-full bg-gradient-to-r from-primary/50 via-accent/40 to-transparent blur-3xl" />
+          <div className="mb-6 overflow-hidden rounded-2xl border border-border/50 bg-background/80">
+            <Image
+              src="/og-paintball.svg"
+              alt="Joueurs de Paintball Méditerranée prêts à démarrer une partie"
+              width={720}
+              height={540}
+              priority
+              sizes="(min-width: 1024px) 480px, (min-width: 768px) 60vw, 100vw"
+              className="h-full w-full object-cover"
+            />
+          </div>
           <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">
             Une immersion totale
           </p>
