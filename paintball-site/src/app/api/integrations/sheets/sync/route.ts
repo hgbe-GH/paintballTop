@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logger } from "@/lib/logger";
 import { exportBookingsToSheets } from "@/lib/integrations/googleSheets";
 
 const syncSchema = z
@@ -27,11 +28,20 @@ export async function POST(request: Request) {
 
     const result = await exportBookingsToSheets(from, to);
 
-    return NextResponse.json({
+    const responseBody = {
       success: true,
       bookingsAppended: result.bookingsAppended,
       clients: result.clientsUpdated,
+    };
+
+    void logger.info("[SHEETS]", "Exported bookings to Google Sheets", {
+      from: from.toISOString(),
+      to: to.toISOString(),
+      bookingsAppended: result.bookingsAppended,
+      clientsUpdated: result.clientsUpdated,
     });
+
+    return NextResponse.json(responseBody);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
@@ -41,7 +51,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 503 });
     }
 
-    console.error("[Sheets] Failed to export bookings", error);
+    await logger.error("[SHEETS]", "Failed to export bookings", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

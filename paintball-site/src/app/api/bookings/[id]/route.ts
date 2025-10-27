@@ -2,6 +2,7 @@ import { BookingStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logger } from "@/lib/logger";
 import { syncBookingWithSheets } from "@/lib/integrations/googleSheets";
 import { prisma } from "@/lib/prisma";
 import { isNocturne } from "@/lib/slots";
@@ -63,6 +64,9 @@ export async function PATCH(
     });
 
     if (!booking) {
+      await logger.warn("[BOOKING]", "Attempted to update missing booking", {
+        bookingId: params.id,
+      });
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
@@ -81,6 +85,10 @@ export async function PATCH(
       });
 
       if (!packageData) {
+        await logger.warn("[BOOKING]", "Package not found during booking update", {
+          bookingId: params.id,
+          packageId: packageIdForDuration,
+        });
         return NextResponse.json({ error: "Package not found" }, { status: 404 });
       }
 
@@ -104,6 +112,11 @@ export async function PATCH(
       });
 
       if (conflictingBooking) {
+        await logger.warn("[BOOKING]", "Conflict detected while updating booking", {
+          bookingId: params.id,
+          conflictingBookingId: conflictingBooking.id,
+          resourceId,
+        });
         return NextResponse.json(
           {
             error: "Ressource indisponible sur ce créneau.",
@@ -256,13 +269,25 @@ export async function PATCH(
           html: confirmation.html,
           text: confirmation.text,
         });
+        await logger.info("[EMAIL]", "Sent booking status update", {
+          bookingId: updatedBooking.id,
+          recipient: customerRecipient,
+          status: updates.status,
+        });
       } catch (emailError) {
-        console.error(
-          `Failed to send booking status update email for booking ${updatedBooking.id}`,
-          emailError
-        );
+        await logger.error("[EMAIL]", "Failed to send booking status update", {
+          bookingId: updatedBooking.id,
+          recipient: customerRecipient,
+          status: updates.status,
+          error: emailError instanceof Error ? emailError.message : "Unknown error",
+        });
       }
     }
+
+    void logger.info("[BOOKING]", "Booking updated", {
+      bookingId: params.id,
+      changes: Object.keys(updates),
+    });
 
     return NextResponse.json(updatedBooking);
   } catch (error) {
@@ -270,7 +295,10 @@ export async function PATCH(
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
 
-    console.error(`Error updating booking ${params.id}`, error);
+    await logger.error("[BOOKING]", "Error updating booking", {
+      bookingId: params.id,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

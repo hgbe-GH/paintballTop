@@ -5,6 +5,7 @@ import { google, sheets_v4 as sheetsV4 } from "googleapis";
 
 import type { Prisma } from "@/generated/prisma/client";
 import { getEnv } from "@/lib/env";
+import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import {
   computeAddons,
@@ -70,7 +71,7 @@ async function loadServiceAccountConfig(): Promise<ServiceAccountCredentials | n
   const raw = env.GOOGLE_SERVICE_ACCOUNT_JSON;
 
   if (!raw) {
-    console.warn("[Sheets] GOOGLE_SERVICE_ACCOUNT_JSON is not defined.");
+    void logger.warn("[SHEETS]", "GOOGLE_SERVICE_ACCOUNT_JSON is not defined.");
     return null;
   }
 
@@ -87,7 +88,9 @@ async function loadServiceAccountConfig(): Promise<ServiceAccountCredentials | n
           jsonContent = decoded;
         }
       } catch (error) {
-        console.warn("[Sheets] Failed to decode service account JSON as base64.", error);
+        void logger.warn("[SHEETS]", "Failed to decode service account JSON as base64.", {
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       }
     }
   }
@@ -99,7 +102,7 @@ async function loadServiceAccountConfig(): Promise<ServiceAccountCredentials | n
     };
 
     if (!parsed.client_email || !parsed.private_key) {
-      console.error("[Sheets] Service account JSON is missing required fields.");
+      await logger.error("[SHEETS]", "Service account JSON is missing required fields.");
       return null;
     }
 
@@ -108,7 +111,9 @@ async function loadServiceAccountConfig(): Promise<ServiceAccountCredentials | n
       privateKey: normalizePrivateKey(parsed.private_key),
     };
   } catch (error) {
-    console.error("[Sheets] Failed to parse service account JSON.", error);
+    await logger.error("[SHEETS]", "Failed to parse service account JSON.", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return null;
   }
 }
@@ -147,7 +152,15 @@ async function withRetry<T>(operation: () => Promise<T>, attempts = 3, baseDelay
       return await operation();
     } catch (error) {
       lastError = error;
-      console.error(`[Sheets] Operation failed (attempt ${attempt}/${attempts}).`, error);
+      await logger.error(
+        "[SHEETS]",
+        `Operation failed (attempt ${attempt}/${attempts}).`,
+        {
+          attempt,
+          attempts,
+          error: error instanceof Error ? error.message : "Unknown error",
+        }
+      );
 
       if (attempt === attempts) {
         break;
@@ -301,7 +314,10 @@ async function readClientSheetValues(
   } catch (error) {
     const code = (error as { code?: number }).code;
     if (code === 400 || code === 404) {
-      console.warn("[Sheets] Clients sheet appears empty or missing. Proceeding with append only.");
+      void logger.warn(
+        "[SHEETS]",
+        "Clients sheet appears empty or missing. Proceeding with append only."
+      );
       return [];
     }
     throw error;
@@ -317,7 +333,10 @@ async function appendBookingRows(bookings: BookingWithRelations[]): Promise<numb
   const env = getEnv();
 
   if (!sheets || !env.GOOGLE_SHEETS_ID) {
-    console.warn("[Sheets] Google Sheets client not configured; skipping booking export.");
+    void logger.warn(
+      "[SHEETS]",
+      "Google Sheets client not configured; skipping booking export."
+    );
     return 0;
   }
 
@@ -344,7 +363,10 @@ async function upsertClients(bookings: BookingWithRelations[]): Promise<ClientUp
   const env = getEnv();
 
   if (!sheets || !env.GOOGLE_SHEETS_ID) {
-    console.warn("[Sheets] Google Sheets client not configured; skipping client export.");
+    void logger.warn(
+      "[SHEETS]",
+      "Google Sheets client not configured; skipping client export."
+    );
     return { updated: 0, appended: 0 };
   }
 
@@ -460,14 +482,19 @@ export async function syncBookingWithSheets(bookingId: string): Promise<void> {
     const booking = await fetchBookingById(bookingId);
 
     if (!booking) {
-      console.warn(`[Sheets] Booking ${bookingId} not found for synchronization.`);
+      void logger.warn("[SHEETS]", "Booking not found for synchronization", {
+        bookingId,
+      });
       return;
     }
 
     await appendBookingRows([booking]);
     await upsertClients([booking]);
   } catch (error) {
-    console.error(`[Sheets] Failed to synchronize booking ${bookingId}.`, error);
+    await logger.error("[SHEETS]", "Failed to synchronize booking", {
+      bookingId,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }
 

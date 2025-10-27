@@ -2,6 +2,7 @@ import { BookingStatus, Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logger } from "@/lib/logger";
 import { syncBookingWithSheets } from "@/lib/integrations/googleSheets";
 import { prisma } from "@/lib/prisma";
 import { isNocturne } from "@/lib/slots";
@@ -81,13 +82,21 @@ export async function GET(request: Request) {
       orderBy: { dateTimeStart: "asc" },
     });
 
+    void logger.info("[BOOKING]", "Fetched bookings", {
+      from: from.toISOString(),
+      to: to.toISOString(),
+      count: bookings.length,
+    });
+
     return NextResponse.json(bookings);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
 
-    console.error("Error fetching bookings", error);
+    await logger.error("[BOOKING]", "Error fetching bookings", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -104,6 +113,10 @@ export async function POST(request: Request) {
     });
 
     if (!packageData) {
+      await logger.warn("[BOOKING]", "Package not found for booking creation", {
+        packageId,
+      });
+
       return NextResponse.json(
         { error: "Offre introuvable." },
         { status: 404 }
@@ -121,6 +134,14 @@ export async function POST(request: Request) {
       });
 
       if (!defaultResource) {
+        await logger.error(
+          "[BOOKING]",
+          "Default resource missing during booking creation",
+          {
+            defaultResourceName: DEFAULT_RESOURCE_NAME,
+          }
+        );
+
         return NextResponse.json(
           { error: "Ressource par défaut introuvable." },
           { status: 500 }
@@ -135,6 +156,10 @@ export async function POST(request: Request) {
       });
 
       if (!existingResource) {
+        await logger.warn("[BOOKING]", "Selected resource not found", {
+          resourceId,
+        });
+
         return NextResponse.json(
           { error: "Ressource sélectionnée introuvable." },
           { status: 404 }
@@ -159,6 +184,12 @@ export async function POST(request: Request) {
     });
 
     if (conflictingBooking) {
+      await logger.warn("[BOOKING]", "Conflicting booking detected", {
+        bookingId: conflictingBooking.id,
+        requestedStart: startDate.toISOString(),
+        requestedEnd: endDate.toISOString(),
+      });
+
       return NextResponse.json(
         {
           error: "Ressource indisponible sur ce créneau.",
@@ -262,11 +293,16 @@ export async function POST(request: Request) {
             html: confirmation.html,
             text: confirmation.text,
           });
+          await logger.info("[EMAIL]", "Sent booking confirmation", {
+            bookingId: booking.id,
+            recipient: customerRecipient,
+          });
         } catch (emailError) {
-          console.error(
-            `Failed to send booking confirmation email for booking ${booking.id}`,
-            emailError
-          );
+          await logger.error("[EMAIL]", "Failed to send booking confirmation", {
+            bookingId: booking.id,
+            recipient: customerRecipient,
+            error: emailError instanceof Error ? emailError.message : "Unknown error",
+          });
         }
       }
 
@@ -283,11 +319,26 @@ export async function POST(request: Request) {
             html: adminAlert.html,
             text: adminAlert.text,
           });
+          await logger.info("[EMAIL]", "Sent admin booking alert", {
+            bookingId: booking.id,
+            recipient: adminRecipient,
+          });
         } catch (emailError) {
-          console.error(`Failed to send admin booking alert for booking ${booking.id}`, emailError);
+          await logger.error("[EMAIL]", "Failed to send admin booking alert", {
+            bookingId: booking.id,
+            recipient: adminRecipient,
+            error: emailError instanceof Error ? emailError.message : "Unknown error",
+          });
         }
       }
     }
+
+    void logger.info("[BOOKING]", "Booking created", {
+      bookingId: booking.id,
+      packageId,
+      resourceId: booking.resourceId,
+      groupSize,
+    });
 
     return NextResponse.json(booking, { status: 201 });
   } catch (error) {
@@ -295,7 +346,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
 
-    console.error("Error creating booking", error);
+    await logger.error("[BOOKING]", "Error creating booking", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
