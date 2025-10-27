@@ -93,7 +93,7 @@ export function MobileActionDock() {
   }
 
   const actionClass =
-    "flex flex-1 items-center justify-center gap-2 rounded-full border border-border/70 bg-card/90 px-3 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-foreground shadow-sm transition hover:bg-primary/10";
+    "flex flex-1 items-center justify-center gap-2 rounded-full border border-border/70 bg-card/90 px-3 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-foreground shadow-sm transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
   return (
     <>

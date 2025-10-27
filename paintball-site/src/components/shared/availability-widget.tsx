@@ -38,18 +38,20 @@ export function AvailabilityWidget() {
   return (
     <section
       id="tarifs"
+      role="region"
+      aria-labelledby="availability-heading"
       className="mx-auto mt-8 max-w-6xl rounded-3xl border border-border/70 bg-card/70 px-4 py-12 shadow-lg backdrop-blur sm:px-6 lg:px-12"
     >
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
         <div className="space-y-4">
-          <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">
+          <h2 id="availability-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">
             Planifiez votre mission
           </h2>
           <p className="max-w-2xl text-sm text-muted-foreground">
             Choisissez une date et un créneau : notre équipe confirme en moins de 24 heures avec les détails tarifaires
             adaptés à votre groupe. Les sessions incluent 200 billes par joueur et l’accès aux équipements premium.
           </p>
-          <div className="rounded-2xl border border-dashed border-primary/40 bg-background/80 p-4">
+          <div className="rounded-2xl border border-dashed border-primary/40 bg-background/80 p-4" role="status" aria-live="polite">
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Disponibilité sélectionnée</p>
             <p className="mt-2 font-heading text-lg text-primary">
               {date ? formattedDate : "À définir"}
@@ -66,10 +68,11 @@ export function AvailabilityWidget() {
             onSelect={setDate}
             locale={fr}
             disabled={(currentDate) => isBefore(startOfDay(currentDate), startOfDay(new Date()))}
+            aria-label="Calendrier des disponibilités"
             className="mx-auto rounded-3xl border border-border/60 bg-background p-4"
           />
           <Select value={slot} onValueChange={setSlot}>
-            <SelectTrigger className="w-full rounded-full border-border/60 bg-background/80">
+            <SelectTrigger aria-label="Sélectionnez un créneau horaire" className="w-full rounded-full border-border/60 bg-background/80">
               <SelectValue placeholder="Choisissez un créneau" />
             </SelectTrigger>
             <SelectContent className="rounded-2xl border border-border/60 bg-background/95">
@@ -90,7 +93,7 @@ export function AvailabilityWidget() {
       </div>
       <div className="mt-8 flex justify-center">
         <Button asChild className="rounded-full bg-primary px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-lg transition hover:bg-primary/90">
-          <Link href="#tarifs">Réserver</Link>
+          <Link href="#tarifs" aria-label="Accéder aux tarifs pour réserver">Réserver</Link>
         </Button>
       </div>
     </section>

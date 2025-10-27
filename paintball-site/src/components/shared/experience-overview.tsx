@@ -27,10 +27,15 @@ const experiences = [
 
 export function ExperienceOverview() {
   return (
-    <section id="experiences" className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+    <section
+      id="experiences"
+      role="region"
+      aria-labelledby="experiences-heading"
+      className="mx-auto max-w-6xl px-4 py-12 sm:px-6"
+    >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">
+          <h2 id="experiences-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">
             Missions signatures
           </h2>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
@@ -71,7 +76,9 @@ export function ExperienceOverview() {
       </div>
       <div className="mt-8 flex justify-end">
         <Button asChild className="rounded-full bg-primary px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-lg transition hover:bg-primary/90">
-          <Link href="#tarifs">Réserver</Link>
+          <Link href="#tarifs" aria-label="Réserver une expérience">
+            Réserver
+          </Link>
         </Button>
       </div>
     </section>

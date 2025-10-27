@@ -14,7 +14,11 @@ const WAZE_URL = `https://waze.com/ul?ll=${LATITUDE},${LONGITUDE}&navigate=yes`;
 
 export function MapSection() {
   return (
-    <section className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6">
+    <section
+      role="region"
+      aria-labelledby="map-heading"
+      className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6"
+    >
       <div className="grid gap-8 rounded-3xl border border-border/70 bg-card/70 p-6 shadow-xl sm:p-10 lg:grid-cols-[1.2fr_1fr]">
         <div className="overflow-hidden rounded-2xl border border-border/60 bg-background/80">
           <iframe
@@ -29,7 +33,7 @@ export function MapSection() {
         <div className="flex flex-col justify-between gap-6">
           <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Nous trouver</p>
-            <h2 className="font-heading text-2xl tracking-[0.35em] text-foreground">
+            <h2 id="map-heading" className="font-heading text-2xl tracking-[0.35em] text-foreground">
               Route des Pins
             </h2>
             <p className="text-sm text-muted-foreground sm:text-base">
@@ -58,7 +62,12 @@ export function MapSection() {
               asChild
               className="w-full rounded-full bg-primary px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-lg transition hover:bg-primary/90"
             >
-              <a href={GOOGLE_MAPS_DIRECTIONS_URL} target="_blank" rel="noopener noreferrer">
+              <a
+                href={GOOGLE_MAPS_DIRECTIONS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ouvrir l'itinéraire dans Google Maps dans un nouvel onglet"
+              >
                 Ouvrir Google Maps
               </a>
             </Button>
@@ -67,7 +76,12 @@ export function MapSection() {
               variant="outline"
               className="w-full rounded-full border-primary/40 px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary shadow-lg transition hover:bg-primary/10 sm:w-auto"
             >
-              <a href={WAZE_URL} target="_blank" rel="noopener noreferrer">
+              <a
+                href={WAZE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ouvrir l'itinéraire dans Waze dans un nouvel onglet"
+              >
                 Ouvrir Waze
               </a>
             </Button>

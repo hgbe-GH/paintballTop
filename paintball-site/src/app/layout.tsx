@@ -141,10 +141,13 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${rajdhani.variable} bg-background text-foreground antialiased`}>
+        <a href="#main-content" className="skip-link">
+          Aller au contenu principal
+        </a>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
-            <main className="flex-1">
+            <main id="main-content" role="main" tabIndex={-1} className="flex-1">
               {children}
             </main>
             <SiteFooter />
