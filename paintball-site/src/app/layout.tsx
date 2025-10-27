@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Rajdhani } from "next/font/google";
+import Script from "next/script";
 
 import "./globals.css";
 import { Providers } from "@/components/shared/providers";
@@ -127,6 +128,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const analyticsId = process.env.ANALYTICS_ID;
+
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
@@ -148,6 +151,22 @@ export default function RootLayout({
           </div>
           <MobileActionDock />
         </Providers>
+        {analyticsId ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga-setup" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${analyticsId}');
+              `}
+            </Script>
+          </>
+        ) : null}
       </body>
     </html>
   );
