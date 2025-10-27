@@ -62,7 +62,7 @@ const bookingWizardSchema = z.object({
     .min(1, "Choisissez un créneau"),
   contact: contactSchema,
   addons: z
-    .record(z.coerce.number().int().min(0, "Quantité invalide"))
+    .record(z.string(), z.coerce.number().int().min(0, "Quantité invalide"))
     .default({}),
   consent: z.literal(true, {
     errorMap: () => ({ message: "Vous devez accepter la politique de confidentialité" }),
@@ -130,6 +130,10 @@ export function BookingWizard() {
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [lastSelectedDate, setLastSelectedDate] = useState<Date | null>(null);
+  const [lastSelectedSlot, setLastSelectedSlot] = useState<string | null>(null);
 
   const form = useForm<BookingWizardValues>({
     resolver: zodResolver(bookingWizardSchema),
@@ -176,17 +180,21 @@ export function BookingWizard() {
   useEffect(() => {
     if (!selectedPackage) {
       form.setValue("slot", "");
+      setLastSelectedSlot(null);
     }
   }, [selectedPackage, form]);
 
+  const effectiveDate = selectedDate ?? lastSelectedDate;
+  const effectiveSlot = selectedSlot ?? lastSelectedSlot;
+
   const startISO = useMemo(() => {
-    if (!selectedDate || !selectedSlot) {
+    if (!effectiveDate || !effectiveSlot) {
       return null;
     }
 
-    const merged = mergeDateWithTime(selectedDate, selectedSlot);
+    const merged = mergeDateWithTime(effectiveDate, effectiveSlot);
     return merged.toISOString();
-  }, [selectedDate, selectedSlot]);
+  }, [effectiveDate, effectiveSlot]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -301,10 +309,12 @@ export function BookingWizard() {
   const nocturneSelected = startISO ? isNocturne(startISO, "20:00") : false;
 
   const handlePrevious = () => {
+    setSubmitSuccess(false);
     setStep((current) => Math.max(0, current - 1));
   };
 
   const handleNext = async () => {
+    setSubmitSuccess(false);
     const fields = STEP_FIELDS[step];
     if (!fields) return;
 
@@ -315,7 +325,7 @@ export function BookingWizard() {
     }
   };
 
-  const onSubmit = (values: BookingWizardValues) => {
+  const onSubmit = async (values: BookingWizardValues) => {
     if (!startISO) {
       toast.error("Choisissez un créneau valide");
       return;
@@ -323,15 +333,79 @@ export function BookingWizard() {
 
     const payload = {
       packageId: values.packageId,
-      groupSize: values.groupSize,
+      groupSize: Number(values.groupSize),
       startISO,
-      contact: values.contact,
+      customer: {
+        name: values.contact.name,
+        email: values.contact.email?.trim() || undefined,
+        phone: values.contact.phone?.trim() || undefined,
+      },
       addons: addonsPayload,
-      consent: values.consent,
     };
 
-    console.info("Reservation payload", payload);
-    toast.success("Votre demande de réservation a été envoyée !");
+    try {
+      setSubmitSuccess(false);
+      setIsSubmitting(true);
+
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        const message =
+          typeof errorData?.error === "string"
+            ? errorData.error
+            : "Erreur lors de l'envoi de la réservation";
+        throw new Error(message);
+      }
+
+      toast.success("Réservation enregistrée ! Nous revenons vers vous rapidement.");
+      setSubmitSuccess(true);
+      setQuote(null);
+      setQuoteError(null);
+      setStep(0);
+
+      const resetAddons = addons.reduce<Record<string, number>>((acc, addon) => {
+        acc[addon.id] = 0;
+        return acc;
+      }, {});
+
+      form.reset({
+        packageId: "",
+        groupSize: 8,
+        date: undefined,
+        slot: "",
+        contact: {
+          name: "",
+          email: "",
+          phone: "",
+        },
+        addons: resetAddons,
+        consent: false,
+      });
+      setLastSelectedDate(null);
+      setLastSelectedSlot(null);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Erreur lors de l'envoi de la réservation";
+      toast.error(message);
+      setSubmitSuccess(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const triggerSubmit = () => {
+    if (effectiveDate) {
+      form.setValue("date", effectiveDate, { shouldDirty: false, shouldTouch: false, shouldValidate: false });
+    }
+    if (effectiveSlot) {
+      form.setValue("slot", effectiveSlot, { shouldDirty: false, shouldTouch: false, shouldValidate: false });
+    }
+    form.handleSubmit(onSubmit)();
   };
 
   const renderStep = () => {
@@ -430,7 +504,10 @@ export function BookingWizard() {
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={(date) => field.onChange(date)}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        setLastSelectedDate(date ?? null);
+                      }}
                       locale={fr}
                       disabled={(currentDate) =>
                         isBefore(startOfDay(currentDate), startOfDay(new Date()))
@@ -447,7 +524,14 @@ export function BookingWizard() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Créneau horaire</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange} disabled={!slots.length}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setLastSelectedSlot(value);
+                      }}
+                      disabled={!slots.length}
+                    >
                       <FormControl>
                         <SelectTrigger className="w-full rounded-xl border-border/60 bg-background/80">
                           <SelectValue placeholder="Sélectionnez un créneau" />
@@ -643,7 +727,13 @@ export function BookingWizard() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            triggerSubmit();
+          }}
+          className="space-y-8"
+        >
         <div className="rounded-3xl border border-border/70 bg-card/70 p-6 shadow-lg backdrop-blur">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
             <div>
@@ -670,6 +760,16 @@ export function BookingWizard() {
             </div>
           </div>
 
+          {submitSuccess ? (
+            <div
+              className="mt-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-700"
+              data-testid="booking-success"
+            >
+              <span className="sr-only">Réservation envoyée avec succès.</span>
+              Votre demande a bien été envoyée ! Nous revenons vers vous rapidement.
+            </div>
+          ) : null}
+
           <div className="mt-6">
             {isLoadingData ? (
               <p className="text-sm text-muted-foreground">Chargement des options de réservation…</p>
@@ -688,8 +788,16 @@ export function BookingWizard() {
               Étape suivante
             </Button>
           ) : (
-            <Button type="submit" className="px-6 py-6 text-sm uppercase tracking-[0.25em]">
-              Confirmer la réservation
+            <Button
+              type="button"
+              className="px-6 py-6 text-sm uppercase tracking-[0.25em]"
+              disabled={isSubmitting}
+              onClick={(event) => {
+                event.preventDefault();
+                triggerSubmit();
+              }}
+            >
+              {isSubmitting ? "Envoi en cours…" : "Confirmer la réservation"}
             </Button>
           )}
         </div>
