@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { addDays, format, isBefore, startOfDay } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -86,6 +87,11 @@ export function AvailabilityWidget() {
             Pré-réserver ce créneau
           </Button>
         </div>
+      </div>
+      <div className="mt-8 flex justify-center">
+        <Button asChild className="rounded-full bg-primary px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-lg transition hover:bg-primary/90">
+          <Link href="#tarifs">Réserver</Link>
+        </Button>
       </div>
     </section>
   );

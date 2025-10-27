@@ -60,7 +60,7 @@ export function Hero() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="rounded-full bg-primary px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-xl hover:bg-primary/90">
-                  Réserver une session
+                  Réserver
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-background/95 backdrop-blur">

@@ -47,8 +47,11 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <Button className="rounded-full bg-primary px-6 font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-lg transition hover:bg-primary/90">
-            Réserver
+          <Button
+            asChild
+            className="rounded-full bg-primary px-6 font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-lg transition hover:bg-primary/90"
+          >
+            <Link href="#tarifs">Réserver</Link>
           </Button>
         </nav>
         <div className="flex items-center gap-3 md:gap-5">
@@ -82,10 +85,12 @@ export function SiteHeader() {
                   </Link>
                 ))}
                 <Button
+                  asChild
                   className="mt-2 w-full rounded-full bg-primary py-6 text-primary-foreground shadow-lg hover:bg-primary/90"
-                  onClick={() => setOpen(false)}
                 >
-                  Réserver
+                  <Link href="#tarifs" onClick={() => setOpen(false)}>
+                    Réserver
+                  </Link>
                 </Button>
               </div>
             </SheetContent>

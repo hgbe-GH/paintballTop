@@ -1,4 +1,7 @@
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const experiences = [
@@ -65,6 +68,11 @@ export function ExperienceOverview() {
             ))}
           </TableBody>
         </Table>
+      </div>
+      <div className="mt-8 flex justify-end">
+        <Button asChild className="rounded-full bg-primary px-8 py-6 text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground shadow-lg transition hover:bg-primary/90">
+          <Link href="#tarifs">Réserver</Link>
+        </Button>
       </div>
     </section>
   );
