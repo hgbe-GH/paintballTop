@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "@/components/shared/providers";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { SiteHeader } from "@/components/shared/site-header";
+import { MobileActionDock } from "@/components/shared/mobile-action-dock";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
             </main>
             <SiteFooter />
           </div>
+          <MobileActionDock />
         </Providers>
       </body>
     </html>
