@@ -3,6 +3,9 @@
 import type { FormEventHandler } from 'react';
 import { useMemo, useState } from 'react';
 
+const EMAIL = 'contact@paintballmediterranee.com';
+const MIN_PLAYERS = 8;
+const MAX_PLAYERS = 40;
 const EMAIL = 'contact@paintball-med.com';
 const MIN_PLAYERS = 4;
 const MAX_PLAYERS = 24;
@@ -96,6 +99,7 @@ export function ReservationForm() {
     setStatus({
       type: 'success',
       message:
+        'Votre messagerie s’ouvre avec le récapitulatif. Après confirmation, déposez votre acompte pour garantir le créneau.',
         'Votre messagerie va s’ouvrir avec un récapitulatif. Nous vous confirmons le créneau sous 24h ouvrées.',
     });
     resetForm();
@@ -160,8 +164,8 @@ export function ReservationForm() {
         <button type="submit" className="button-primary">
           Envoyer la demande
         </button>
-        <a className="button-secondary" href="tel:+33442000000">
-          Appeler +33 4 42 00 00 00
+        <a className="button-secondary" href="tel:+33623735002">
+          Appeler 06 23 73 50 02
         </a>
       </div>
       {status.type !== 'idle' ? (

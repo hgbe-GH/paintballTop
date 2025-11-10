@@ -1,232 +1,166 @@
 import { ReservationForm } from './components/reservation-form';
 
 const highlights = [
-  { value: '5 terrains', label: 'scénarisés au cœur de la garrigue' },
-  { value: '15 ans', label: 'd’encadrement paintball & gellyball' },
-  { value: '24 joueurs', label: 'gérés simultanément par nos arbitres' },
-  { value: '20 min', label: 'de Marseille — accès A55 & parking' },
-const highlights = [
-  { value: '4 hectares', label: 'de terrain boisé et modulable' },
-  { value: '12 scénarios', label: 'inspirés des opérations tactiques' },
-  { value: '7j/7', label: 'sur réservation pour groupes & entreprises' },
+  { value: 'Montpellier', label: '140 passage Charles Tillon' },
+  { value: '8 joueurs', label: 'minimum par session' },
+  { value: 'Jusqu’à 2 h', label: 'de jeu en calibre .50' },
+  { value: 'Cadre boisé', label: 'buvette, pétanque & molky' },
 ];
 
 const features = [
   {
-    title: 'Staff certifié & briefing tactique',
+    title: 'Encadrement passionné',
     description:
-      'Chaque session démarre par un briefing sécurité personnalisé, un échauffement progressif et un arbitre dédié qui anime vos missions.',
-    badge: 'Encadrement pro',
+      'Briefing sécurité, scénarios adaptés et arbitre dédié pour chaque groupe. Tommy et l’équipe veillent à votre confort du début à la fin.',
+    badge: 'Staff sur place',
   },
   {
-    title: 'Équipements premium inclus',
+    title: 'Équipement complet inclus',
     description:
-      'Masques anti-buée, lanceurs dernière génération, combinaisons intégrales et protections de cou sont préparés et désinfectés avant votre arrivée.',
-    badge: 'Matériel entretenu',
+      'Casques, lanceurs, plastrons, tours de cou et vestes dédiées aux femmes et enfants (-14 ans) sont fournis. Un sweat-shirt et une paire de gants suffisent.',
+    badge: 'Prêt à jouer',
   },
   {
-    title: 'Expériences pour tous',
+    title: 'Expériences sur mesure',
     description:
-      'Paintball classique ou Gellyball à faible impact dès 8 ans, scénarios adaptés aux anniversaires, EVG/EVJF, entreprises et associations.',
+      'Paintball classique, gellyball et formules Link Ranger dès 8 ans. Forfaits adaptés aux EVG/EVJF, anniversaires, entreprises et sorties scolaires.',
     badge: 'Dès 8 ans',
   },
   {
-    title: 'Espace chill & traiteur',
+    title: 'Accueil convivial',
     description:
-      'Terrasse ombragée, boissons fraîches, jeux en libre accès et possibilité de privatiser un espace repas avec traiteur partenaire.',
-    badge: 'Options sur mesure',
-    title: 'Encadrement professionnel',
-    description:
-      'Animateurs diplômés, briefing sécurité personnalisé et suivi de partie pour garantir une expérience intense mais accessible à tous.',
-    badge: 'Briefing & coaching inclus',
-  },
-  {
-    title: 'Équipements premium',
-    description:
-      'Combinaisons, masques anti-buée, gants renforcés et lanceurs dernière génération préparés avant votre arrivée.',
-    badge: 'Hygiène & entretien rigoureux',
-  },
-  {
-    title: 'Scénarios immersifs',
-    description:
-      'Capture de drapeau, escorte de VIP, domination de zone ou battle royale : adaptez chaque partie à votre groupe.',
-    badge: 'Adapté débutants & confirmés',
-  },
-  {
-    title: 'Zone chill & restauration',
-    description:
-      'Espace ombragé avec boissons fraîches, tables pour anniversaires et possibilité de traiteur partenaire sur demande.',
-    badge: 'Options sur-mesure',
+      'Cadre boisé en lisière de rivière avec buvette, pétanque, fléchettes, molky et espace chill pour profiter entre les parties.',
+    badge: 'Esprit club',
   },
 ];
 
-const packages = [
+const paintballPackages = [
   {
     name: 'Découverte',
     price: '20 € / joueur',
-    details: ['120 billes incluses', '2 h sur 5 terrains', 'Briefing complet + arbitre'],
-    highlight: 'Idéal première partie',
+    details: ['120 billes incluses', 'Jusqu’à 2 h de session', 'Briefing & arbitre dédiés'],
+    highlight: 'Idéal pour débuter',
   },
   {
     name: 'Méditerranée',
     price: '25 € / joueur',
-    details: ['200 billes incluses', 'Missions tactiques avancées', 'Pause boisson offerte'],
-    highlight: 'Best-seller',
+    details: ['200 billes incluses', 'Jusqu’à 2 h de session', 'Ambiance scénarisée'],
+    highlight: 'Classique',
   },
   {
-    name: 'Punisher',
+    name: 'Player',
+    price: '30 € / joueur',
+    details: ['300 billes incluses', 'Jusqu’à 2 h de session', 'Cadence soutenue'],
+    highlight: 'Pour joueurs réguliers',
+  },
+  {
+    name: 'Punisher (promo été)',
     price: '35 € / joueur',
-    details: ['450 billes incluses', 'Accès nocturne sur devis', 'Options fumigènes & coaching'],
-    highlight: 'Équipes expertes',
+    details: ['450 billes incluses', 'Jusqu’à 2 h de session', 'Idéal pour les gros volumes'],
+    highlight: 'Best-seller été',
   },
   {
-    name: 'Tout public (dès 8 ans)',
-    price: '18 € / joueur',
-    details: ['Gellyball à faible impact', '90 min encadrées', 'Matériel léger adapté enfants'],
-    highlight: 'Familles & scolaires',
-  },
-  {
-    name: 'Link Ranger',
-    price: '18 € / joueur',
-    details: ['Parcours immersif thématisé', 'Version Paintball ou Orbeez', 'Briefing sécurité VIP'],
-    highlight: 'Expérience signature',
+    name: 'Expendables',
+    price: '45 € / joueur',
+    details: ['600 billes incluses', 'Jusqu’à 2 h de session', 'Sessions longues & intensives'],
+    highlight: 'Équipe survoltée',
   },
 ];
 
-const addons = [
-  { name: 'Recharge +100 billes', price: '6 €', description: 'Ajoutez 100 billes supplémentaires pour prolonger la mission.' },
-  { name: 'Combinaison intégrale tissu', price: '4 €', description: 'Protection optimale pour les sessions intensives.' },
-  { name: 'Gants coqués', price: '2,50 €', description: 'Renforcez l’adhérence et la protection de vos mains.' },
-  { name: 'Nocturne (>=20h) / pers', price: '4 €', description: 'Illumination scénographique et bande-son sur-mesure.' },
-  { name: 'Costume de lapin', price: '25 €', description: 'Incontournable pour les EVG/EVJF et défis fun.' },
-    name: 'Escarmouche',
-    price: '29€ / joueur',
-    details: ['200 billes incluses', 'Session de 2 heures', 'Briefing sécurité + coach', 'Photos souvenir offertes'],
-    highlight: 'Idéal découverte',
+const extras = [
+  { name: 'Recharge +100 billes', price: '6 €', description: 'Ajoutez 100 billes pour prolonger la session.' },
+  { name: 'Combinaison intégrale tissu', price: '4 €', description: 'Protection intégrale pour plonger dans l’action.' },
+  { name: 'Gants coqués', price: '2,50 €', description: 'Renforcez la prise en main et la protection des mains.' },
+  { name: 'Costume de lapin', price: '25 €', description: 'Accessoire parfait pour les défis EVG/EVJF.' },
+  { name: 'Nocturne (dès 20h00) / joueur', price: '+4 €', description: 'Ambiance nocturne immersive sur réservation.', },
+];
+
+const publicBundles = [
+  {
+    name: 'Forfait tout public',
+    price: '18 € / personne',
+    details: ['Paintball dès 8 ans', 'Paintball ou gellyball au choix', 'Encadrement adapté aux plus jeunes'],
+    highlight: 'Familles & écoles',
+  },
+];
+
+const linkRangerOptions = [
+  {
+    name: 'Paintball Link Ranger',
+    price: '18 € / personne',
+    details: ['120 billes', 'Jusqu’à 1 h 30 de jeu', 'Recharge +100 billes : 6 €'],
+    highlight: 'Scénario immersif',
   },
   {
-    name: 'Offensive',
-    price: '39€ / joueur',
-    details: [
-      '350 billes incluses',
-      'Session de 3 heures',
-      'Accès scénarios exclusifs',
-      'Réservations groupes prioritaires',
-    ],
-    highlight: 'Best-seller',
+    name: 'Orbeez Link Ranger',
+    price: '18 € / personne',
+    details: ['1 600 billes Orbeez', 'Jusqu’à 1 h de jeu', 'Impact ultra léger'],
+    highlight: 'Dès 8 ans',
+  },
+];
+
+const equipmentIncluded = [
+  'Casque & masque de protection',
+  'Lanceur paintball calibré .50',
+  'Plastron & tour de cou',
+  'Veste pour les femmes et enfants de moins de 14 ans',
+  'Briefing sécurité + arbitre dédié',
+  'Conseils tenue : sweat-shirt & gants suffisent',
+];
+
+const convivialities = [
+  {
+    title: 'Buvette & pause fraîcheur',
+    description: 'Boissons fraîches et snacks pour récupérer entre deux scénarios.',
   },
   {
-    name: 'Élite',
-    price: '55€ / joueur',
-    details: ['500 billes incluses', 'Session illimitée sur la journée', 'Animateur dédié', 'Options fumigènes & props'],
-    highlight: 'Team building',
+    title: 'Jeux d’extérieur',
+    description: 'Pétanque, fléchettes, molky et espaces chill à partager.',
+  },
+  {
+    title: 'Parking & covoiturage',
+    description: 'Petit parking privé à 100 m : pensez au covoiturage pour la planète.',
   },
 ];
 
 const schedule = [
   {
-    title: 'Matinée adrénaline',
-    slots: '09h00 — 12h00',
-    description: 'Températures douces, briefing prolongé et missions évolutives pour lancer la journée.',
+    title: 'Sessions journée',
+    slots: '09h00 – 20h00 sur réservation',
+    description: 'Créneaux planifiés par tranche de 2 h selon la disponibilité de votre groupe.',
   },
   {
-    title: 'Après-midi dynamique',
-    slots: '14h00 — 17h00',
-    description: 'Ambiance conviviale, playlists motivantes et rotations rapides entre les terrains.',
+    title: 'Nocturne',
+    slots: 'Dès 20h00 (+4 € / joueur)',
+    description: 'Illuminations et ambiance sonore pour prolonger la soirée.',
   },
   {
-    title: 'Nocturne privée',
-    slots: 'Sur devis',
-    description: 'Lumières LED, fumigènes et scénario exclusif pour team building ou anniversaires adultes.',
-    title: 'Sessions matinales',
-    slots: '09h00 — 12h00',
-    description: 'Parfait pour profiter de la fraîcheur et commencer la journée avec une dose d’adrénaline.',
-  },
-  {
-    title: 'Sessions après-midi',
-    slots: '14h00 — 17h00',
-    description: 'Ambiance dynamique avec soleil couchant, idéale pour les groupes d’amis et EVJF/EVG.',
-  },
-  {
-    title: 'Nocturnes privées',
-    slots: 'Sur devis',
-    description: 'Éclairage scénographique, musique et scénarios exclusifs pour vos événements d’entreprise.',
-  },
-];
-
-const testimonials = [
-  {
-    quote:
-      'Organisation millimétrée pour notre séminaire : briefing clair, matériel nickel et staff hyper réactif. Les équipes en redemandent déjà !',
-    name: 'Marion P.',
-    role: 'Directrice RH — Agence MedCom',
-  },
-  {
-    quote:
-      'Un anniversaire d’enfants réussi grâce au Gellyball. L’équipe encadre tout, les parents peuvent profiter de la terrasse ombragée.',
-    name: 'Olivier D.',
-    role: 'Parent',
-  },
-  {
-    quote:
-      'Les nocturnes sont incroyables : lumières, musique et missions en mode infiltration. On reviendra avec tout le club.',
-    name: 'Sonia L.',
-      'Une équipe au top ! Nous avons organisé un team building pour 35 personnes, tout était millimétré : brief, matériel, scénarios personnalisés… On revient l’année prochaine.',
-    name: 'Élodie R.',
-    role: 'Responsable RH — TechWave',
-  },
-  {
-    quote:
-      'Super organisation pour l’anniversaire de notre fils. Les encadrants ont su mettre les enfants en confiance et l’espace chill permettait aux parents de profiter.',
-    name: 'Karim B.',
-    role: 'Parent heureux',
-  },
-  {
-    quote:
-      'Des sensations incroyables ! Les scénarios sont variés et l’équipe nous laisse personnaliser les parties selon nos envies. Mention spéciale pour les nocturnes.',
-    name: 'Maëva G.',
-    role: 'Capitaine d’équipe amateur',
+    title: 'Groupes & privatisations',
+    slots: 'À partir de 8 joueurs',
+    description: 'EVG, EVJF, anniversaires, team building : contactez-nous pour un devis personnalisé.',
   },
 ];
 
 const faqs = [
   {
-    question: 'Quel est le nombre minimum de joueurs ?',
+    question: 'Combien de joueurs faut-il pour réserver ?',
     answer:
-      'Nous accueillons les groupes à partir de 4 joueurs. Pour privatiser un terrain, comptez 8 joueurs minimum ou un forfait spécifique.',
+      'Les sessions sont ouvertes à partir de 8 joueurs. En dessous, les places manquantes sont facturées 25 € / personne pour privatiser le terrain.',
   },
   {
-    question: 'Peut-on mixer paintball et gellyball ?',
+    question: 'Que comprend l’acompte ?',
     answer:
-      'Oui, nous proposons des parcours Link Ranger déclinés en version Paintball ou Orbeez (Gellyball) pour alterner les intensités sur la même demi-journée.',
+      'Pour valider votre créneau, déposez un acompte sécurisé sur https://www.paintballmediterranee.com/produit.php?id_prod=1. Il est restitué sur place le jour J.',
   },
   {
-    question: 'Comment fonctionne le dépôt ?',
+    question: 'Que dois-je apporter ?',
     answer:
-      'Un acompte en ligne sécurisé est demandé après validation du créneau par notre équipe. Le solde se règle sur place (CB ou espèces).',
+      'Prévoyez une tenue adaptée : chaussures fermées, vêtements confortables et éventuellement un sweat-shirt. Le reste de l’équipement est fourni.',
   },
   {
-    question: 'Y a-t-il des espaces pour se restaurer ?',
+    question: 'Comment nous rejoindre ?',
     answer:
-      'Un espace chill ombragé avec boissons fraîches est inclus. Sur demande, nous pouvons réserver un traiteur partenaire ou mettre à disposition un espace barbecue.',
-    question: 'Peut-on jouer si l’on n’a jamais fait de paintball ?',
-    answer:
-      'Bien sûr ! Chaque session débute par un briefing sécurité complet et des premiers scénarios d’échauffement adaptés aux débutants. Nos animateurs restent présents sur le terrain pour accompagner le groupe.',
-  },
-  {
-    question: 'Quels équipements sont fournis ?',
-    answer:
-      'Chaque joueur dispose d’un lanceur, d’un masque anti-buée, d’une combinaison, de protections de cou et de gants. Les forfaits incluent un quota de billes et vous pouvez en racheter sur place.',
-  },
-  {
-    question: 'Comment réserver et payer ?',
-    answer:
-      'Réservez en ligne via notre agenda ou contactez-nous par téléphone. Un acompte sécurisé par carte est demandé pour bloquer le créneau et le solde se règle sur place le jour J.',
-  },
-  {
-    question: 'Y a-t-il un minimum de participants ?',
-    answer:
-      'Les sessions privées sont possibles dès 8 joueurs. Nous pouvons vous intégrer à un autre groupe pour les petits effectifs, contactez-nous pour connaître les disponibilités.',
+      'Rendez-vous 140 passage Charles Tillon, 34070 Montpellier. Depuis le rond-point de Chez Paulette, prenez la piste cyclable : parking à 100 m sur la droite. Merci d’arriver 5 minutes avant.',
   },
 ];
 
@@ -235,8 +169,7 @@ export default function HomePage() {
     <div className="page">
       <header className="navbar">
         <div className="navbar__inner">
-          <span className="navbar__brand">Paintball Méditerranée</span>
-          <span className="navbar__brand">PaintballTop</span>
+          <span className="navbar__brand">Paintball Méditerranée Montpellier</span>
           <nav aria-label="Navigation principale">
             <ul className="navbar__links">
               <li>
@@ -253,22 +186,14 @@ export default function HomePage() {
               </li>
               <li>
                 <a href="#plan">Accès</a>
-                <a href="#tarifs">Tarifs</a>
-              </li>
-              <li>
-                <a href="#disponibilites">Disponibilités</a>
-              </li>
-              <li>
-                <a href="#temoignages">Avis</a>
-              </li>
-              <li>
-                <a href="#faq">FAQ</a>
               </li>
               <li>
                 <a href="#contact">Contact</a>
               </li>
             </ul>
           </nav>
+          <a className="navbar__cta" href="tel:+33623735002">
+            Appeler Tommy
           <a className="navbar__cta" href="#reservation">
             Réserver
           </a>
@@ -279,18 +204,18 @@ export default function HomePage() {
         <section className="hero" id="accueil">
           <div className="hero__inner">
             <div className="hero__content">
-              <span className="hero__eyebrow">Route des Pins — Marseille</span>
-              <h1 className="hero__title">Terrain paintball & gellyball nouvelle génération</h1>
+              <span className="hero__eyebrow">Paintball & Gellyball — Montpellier</span>
+              <h1 className="hero__title">Sessions paintball immersives en pleine nature</h1>
               <p className="hero__description">
-                À 20 minutes de Marseille, Paintball Méditerranée vous accueille sur 5 hectares scénarisés entre garrigue et pinède.
-                Briefings tactiques, équipements premium et ambiance survoltée sont inclus pour chaque session.
+                À 140 passage Charles Tillon, Paintball Méditerranée vous accueille dans un cadre boisé en bord de rivière.
+                Forfaits adaptés à tous les niveaux, encadrement passionné et ambiance conviviale avant, pendant et après vos parties.
               </p>
               <div className="hero__actions">
                 <a className="button-primary" href="#reservation">
-                  Ouvrir la réservation
+                  Demander une date
                 </a>
-                <a className="button-secondary" href="#tarifs">
-                  Consulter les forfaits
+                <a className="button-secondary" href="https://www.paintballmediterranee.com/produit.php?id_prod=1" target="_blank" rel="noopener noreferrer">
+                  Déposer l’acompte
                 </a>
               </div>
             </div>
@@ -298,27 +223,6 @@ export default function HomePage() {
               {highlights.map((item) => (
                 <div key={item.label} className="highlight">
                   <strong style={{ fontSize: '1.35rem' }}>{item.value}</strong>
-              <span className="hero__eyebrow">Paintball en Méditerranée</span>
-              <h1 className="hero__title">
-                L’expérience paintball premium pour vos équipes et vos amis
-              </h1>
-              <p className="hero__description">
-                À deux pas de Montpellier, PaintballTop vous accueille sur un terrain de plusieurs hectares, scénarisé et sécurisé,
-                pour des sessions intenses du lever du soleil jusqu’aux nocturnes privées.
-              </p>
-              <div className="hero__actions">
-                <a className="button-primary" href="#reservation">
-                  Voir les disponibilités
-                </a>
-                <a className="button-secondary" href="#tarifs">
-                  Découvrir nos formules
-                </a>
-              </div>
-            </div>
-            <div className="grid" style={{ gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-              {highlights.map((item) => (
-                <div key={item.label} className="highlight">
-                  <strong style={{ fontSize: '1.4rem' }}>{item.value}</strong>
                   <p style={{ margin: '0.35rem 0 0', color: 'var(--muted)' }}>{item.label}</p>
                 </div>
               ))}
@@ -330,15 +234,10 @@ export default function HomePage() {
           <div className="section__inner">
             <div className="section__header">
               <span className="section__eyebrow">Immersion garantie</span>
-              <h2 className="section__title">Une équipe dédiée à vos missions outdoor</h2>
+              <h2 className="section__title">Une équipe locale pour des missions inoubliables</h2>
               <p className="section__description">
-                Du briefing sécurité jusqu’au retour au calme, nos arbitres passionnés orchestrent des scénarios adaptés à votre groupe.
-                Nous fournissons l’équipement complet, un espace chill ombragé et des options à la carte pour sublimer votre événement.
-              <span className="section__eyebrow">Immersion totale</span>
-              <h2 className="section__title">Un terrain pensé pour l’adrénaline et la cohésion</h2>
-              <p className="section__description">
-                Que vous organisiez un anniversaire, un EVG/EVJF ou un séminaire, nos infrastructures et notre staff s’occupent de tout :
-                briefing sécurité, équipement complet, scénarios adaptés et suivi personnalisé.
+                Briefing sécurité, scénarios fun et encadrement attentionné : tout est pensé pour que votre groupe profite de 2 heures d’action en toute sérénité.
+                Nos terrains accueillent anniversaires, EVG/EVJF, entreprises et sorties en famille dès 8 ans.
               </p>
             </div>
             <div className="grid features-grid">
@@ -356,20 +255,15 @@ export default function HomePage() {
         <section className="section" id="tarifs">
           <div className="section__inner">
             <div className="section__header">
-              <span className="section__eyebrow">Forfaits 2 h</span>
-              <h2 className="section__title">Choisissez votre scénario</h2>
+              <span className="section__eyebrow">Nos forfaits Paintball</span>
+              <h2 className="section__title">Jusqu’à 2 h de session — billes incluses</h2>
               <p className="section__description">
-                Toutes nos formules incluent le briefing tactique, l’arbitrage professionnel et l’accès à nos 5 terrains thématiques.
-                Les billes supplémentaires et options peuvent être ajoutées à tout moment.
-              <span className="section__eyebrow">Formules</span>
-              <h2 className="section__title">Des packs flexibles pour chaque type de groupe</h2>
-              <p className="section__description">
-                Sélectionnez la formule qui correspond à votre événement. Toutes incluent l’encadrement, l’équipement complet et
-                un quota de billes. Options supplémentaires disponibles sur simple demande.
+                Toutes les formules incluent le matériel complet, le briefing sécurité, l’arbitre dédié et l’accès à nos terrains scénarisés.
+                Les recharges et options s’ajoutent facilement selon l’ambiance recherchée.
               </p>
             </div>
             <div className="grid pricing-grid">
-              {packages.map((pack) => (
+              {paintballPackages.map((pack) => (
                 <article key={pack.name} className="pricing-card">
                   <span className="pricing-card__badge">{pack.highlight}</span>
                   <h3>{pack.name}</h3>
@@ -380,8 +274,65 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <a className="button-primary" href="#reservation">
-                    Demander ce forfait
-                    Réserver cette formule
+                    Réserver ce forfait
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section" aria-labelledby="tout-public-title">
+          <div className="section__inner">
+            <div className="section__header">
+              <span className="section__eyebrow">Dès 8 ans</span>
+              <h2 id="tout-public-title" className="section__title">Forfaits paintball tout public 18 € / personne</h2>
+              <p className="section__description">
+                Le plaisir du paintball ou du gellyball en version accessible aux plus jeunes : parfait pour les anniversaires, sorties scolaires ou moments en famille.
+              </p>
+            </div>
+            <div className="grid pricing-grid">
+              {publicBundles.map((bundle) => (
+                <article key={bundle.name} className="pricing-card">
+                  <span className="pricing-card__badge">{bundle.highlight}</span>
+                  <h3>{bundle.name}</h3>
+                  <p className="pricing-card__price">{bundle.price}</p>
+                  <ul>
+                    {bundle.details.map((detail) => (
+                      <li key={detail}>{detail}</li>
+                    ))}
+                  </ul>
+                  <a className="button-secondary" href="#reservation">
+                    Demander ce format
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section" aria-labelledby="link-ranger-title">
+          <div className="section__inner">
+            <div className="section__header">
+              <span className="section__eyebrow">Les Link Ranger</span>
+              <h2 id="link-ranger-title" className="section__title">Forfaits Link Ranger — 18 € / personne</h2>
+              <p className="section__description">
+                Deux expériences immersives inspirées de l’univers Link Ranger : choisissez le paintball ou l’Orbeez (gellyball) pour varier les sensations.
+              </p>
+            </div>
+            <div className="grid pricing-grid">
+              {linkRangerOptions.map((option) => (
+                <article key={option.name} className="pricing-card">
+                  <span className="pricing-card__badge">{option.highlight}</span>
+                  <h3>{option.name}</h3>
+                  <p className="pricing-card__price">{option.price}</p>
+                  <ul>
+                    {option.details.map((detail) => (
+                      <li key={detail}>{detail}</li>
+                    ))}
+                  </ul>
+                  <a className="button-secondary" href="#reservation">
+                    Réserver une session Link Ranger
                   </a>
                 </article>
               ))}
@@ -395,11 +346,11 @@ export default function HomePage() {
               <span className="section__eyebrow">Options à la carte</span>
               <h2 className="section__title">Boostez votre expérience</h2>
               <p className="section__description">
-                Composez un événement unique : rechargez vos billes, ajoutez un costume fun ou transformez votre session en nocturne scénarisée.
+                Complétez votre session avec des recharges de billes, accessoires fun ou ambiance nocturne pour un souvenir inoubliable.
               </p>
             </div>
             <div className="options-grid">
-              {addons.map((addon) => (
+              {extras.map((addon) => (
                 <article key={addon.name} className="option-card">
                   <div>
                     <h3>{addon.name}</h3>
@@ -412,13 +363,50 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="section" aria-labelledby="equipement-title">
+          <div className="section__inner">
+            <div className="section__header">
+              <span className="section__eyebrow">Inclus dans tous les forfaits</span>
+              <h2 id="equipement-title" className="section__title">Équipement & sécurité</h2>
+              <p className="section__description">
+                Tout est prêt à votre arrivée. Il ne vous reste qu’à enfiler une tenue confortable et profiter du briefing pour plonger dans l’action.
+              </p>
+            </div>
+            <ul className="equipment-list">
+              {equipmentIncluded.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="section" aria-labelledby="convivial-title">
+          <div className="section__inner">
+            <div className="section__header">
+              <span className="section__eyebrow">Avant & après la partie</span>
+              <h2 id="convivial-title" className="section__title">Profitez du cadre convivial</h2>
+              <p className="section__description">
+                Nous vous accueillons en lisière de rivière dans un cadre ombragé où toute l’équipe peut se retrouver avant et après les parties.
+              </p>
+            </div>
+            <div className="grid features-grid">
+              {convivialities.map((item) => (
+                <article key={item.title} className="feature-card">
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="section" id="reservation">
           <div className="section__inner">
             <div className="section__header">
               <span className="section__eyebrow">Réserver</span>
               <h2 className="section__title">Bloquez votre créneau en 2 minutes</h2>
               <p className="section__description">
-                Remplissez le formulaire ci-dessous : notre équipe confirme la disponibilité sous 24h ouvrées et vous envoie, si nécessaire, le lien d’acompte sécurisé.
+                Remplissez le formulaire pour nous indiquer la date souhaitée, le nombre de joueurs et vos envies. Nous répondons sous 24 h et vous invitons à déposer l’acompte sécurisé pour confirmer.
               </p>
             </div>
             <ReservationForm />
@@ -429,17 +417,9 @@ export default function HomePage() {
           <div className="section__inner">
             <div className="section__header">
               <span className="section__eyebrow">Créneaux</span>
-              <h2 className="section__title">Des sessions adaptées à votre rythme</h2>
+              <h2 className="section__title">Des sessions adaptées à votre groupe</h2>
               <p className="section__description">
-                Nous ouvrons le terrain 7j/7 sur réservation. Les créneaux ci-dessous sont les plus demandés ; contactez-nous pour une privatisation sur-mesure.
-        <section className="section" id="disponibilites">
-          <div className="section__inner">
-            <div className="section__header">
-              <span className="section__eyebrow">Planifiez</span>
-              <h2 className="section__title">Choisissez votre créneau idéal</h2>
-              <p className="section__description">
-                Nos sessions se remplissent rapidement les week-ends. Consultez les créneaux ci-dessous et contactez-nous pour
-                verrouiller votre réservation. Un conseiller vous guidera dans les 24h.
+                Les plannings sont ajustés selon vos disponibilités. Pensez à nous prévenir au plus tôt pour les nocturnes et les grands groupes.
               </p>
             </div>
             <div className="schedule" aria-label="Créneaux disponibles">
@@ -453,7 +433,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p style={{ margin: 0, color: 'var(--muted)' }}>
-                Agenda mis à jour quotidiennement. Prévenez-nous dès que possible pour les nocturnes et les groupes de plus de 20 joueurs.
+                Merci d’arriver 5 minutes avant le début de la session pour finaliser l’équipement et le briefing.
               </p>
             </div>
           </div>
@@ -463,67 +443,36 @@ export default function HomePage() {
           <div className="section__inner">
             <div className="section__header">
               <span className="section__eyebrow">Accès</span>
-              <h2 className="section__title">Route des Pins — Domaine Chez Paulette</h2>
+              <h2 className="section__title">140 passage Charles Tillon — Montpellier</h2>
               <p className="section__description">
-                Rejoignez-nous facilement depuis Marseille, Vitrolles ou Marignane. Parking gratuit à 100 m, piste cyclable dédiée et covoiturage encouragé.
+                Au rond-point de Chez Paulette, prenez la piste cyclable : notre parking se trouve 100 m plus loin sur la droite. Waze vous guide jusqu’aux portes du terrain.
               </p>
             </div>
             <div className="map-block">
               <iframe
-                title="Localisation de Paintball Méditerranée"
-                src="https://maps.google.com/maps?q=43.36,5.347&z=15&output=embed"
+                title="Localisation de Paintball Méditerranée à Montpellier"
+                src="https://www.google.com/maps?q=140+Passage+Charles+Tillon,+34070+Montpellier&z=16&output=embed"
                 loading="lazy"
                 allowFullScreen
               />
               <div className="map-actions">
-                <a className="button-primary" href="https://www.google.com/maps/dir/?api=1&destination=43.36,5.347" target="_blank" rel="noopener noreferrer">
-                  Itinéraire Google Maps
-                </a>
-                <a className="button-secondary" href="https://waze.com/ul?ll=43.36,5.347&navigate=yes" target="_blank" rel="noopener noreferrer">
-                  Itinéraire Waze
-                Agenda mis à jour quotidiennement. Privatisations possibles en dehors de ces créneaux sur simple demande.
-              </p>
-            </div>
-            <div className="cta-banner" id="reservation">
-              <div>
-                <h2 style={{ margin: '0 0 0.75rem', fontSize: '2rem' }}>Réservez votre session en quelques minutes</h2>
-                <p style={{ margin: 0, color: 'var(--muted)', maxWidth: '60ch' }}>
-                  Indiquez votre date souhaitée et le nombre de participants : notre équipe confirme votre créneau par mail ou téléphone.
-                </p>
-              </div>
-              <div className="cta-banner__actions">
                 <a
                   className="button-primary"
-                  href="mailto:contact@paintballtop.fr?subject=R%C3%A9servation%20PaintballTop"
+                  href="https://www.google.com/maps/dir/?api=1&destination=140%20Passage%20Charles%20Tillon%2C%2034070%20Montpellier"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Demander un créneau
+                  Itinéraire Google Maps
                 </a>
-                <a className="button-secondary" href="tel:+33400000000">
-                  Nous appeler directement
+                <a
+                  className="button-secondary"
+                  href="https://waze.com/ul?ll=43.59341,3.84509&navigate=yes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Itinéraire Waze
                 </a>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section" id="temoignages">
-          <div className="section__inner">
-            <div className="section__header">
-              <span className="section__eyebrow">Avis</span>
-              <h2 className="section__title">Ils recommandent Paintball Méditerranée</h2>
-              <span className="section__eyebrow">Ils témoignent</span>
-              <h2 className="section__title">Des joueurs conquis par l’expérience PaintballTop</h2>
-            </div>
-            <div className="grid testimonials">
-              {testimonials.map((testimonial) => (
-                <blockquote key={testimonial.name} className="testimonial">
-                  <p className="testimonial__quote">“{testimonial.quote}”</p>
-                  <footer className="testimonial__author">
-                    <strong>{testimonial.name}</strong>
-                    <span>{testimonial.role}</span>
-                  </footer>
-                </blockquote>
-              ))}
             </div>
           </div>
         </section>
@@ -549,14 +498,9 @@ export default function HomePage() {
           <div className="section__inner">
             <div className="section__header">
               <span className="section__eyebrow">Contact</span>
-              <h2 className="section__title">Coordonnées & infos pratiques</h2>
+              <h2 className="section__title">Belle journée — Tommy vous répond</h2>
               <p className="section__description">
-                Notre équipe est joignable 7j/7 pour préparer votre événement, privatiser un créneau ou organiser un devis sur-mesure.
-              <span className="section__eyebrow">Nous rencontrer</span>
-              <h2 className="section__title">Contact & accès</h2>
-              <p className="section__description">
-                Notre terrain est situé à 20 minutes de Montpellier, facilement accessible par l’A709. Parking gratuit, vestiaires et
-                douches disponibles sur place.
+                Appelez ou envoyez un message pour organiser votre venue. Pensez au covoiturage, la planète vous dira merci !
               </p>
             </div>
             <div className="contact-grid">
@@ -564,45 +508,28 @@ export default function HomePage() {
                 <h3>Coordonnées</h3>
                 <address>
                   <span>Paintball Méditerranée</span>
-                  <span>Route des Pins — Domaine Chez Paulette</span>
-                  <span>13000 Marseille</span>
-                  <a href="tel:+33442000000">+33 4 42 00 00 00</a>
-                  <a href="mailto:contact@paintball-med.com">contact@paintball-med.com</a>
+                  <span>140 passage Charles Tillon</span>
+                  <span>34070 Montpellier</span>
+                  <span>Tommy — Responsable terrain</span>
+                  <a href="tel:+33623735002">06 23 73 50 02</a>
+                  <a href="mailto:contact@paintballmediterranee.com">contact@paintballmediterranee.com</a>
                 </address>
               </div>
               <div className="contact-card">
-                <h3>Horaires</h3>
-                <address>
-                  <span>Lundi au vendredi : 09h00 — 18h00</span>
-                  <span>Samedi : 09h00 — 19h00</span>
-                  <span>Dimanche : 10h00 — 17h00 (sur réservation)</span>
-                </address>
-              </div>
-              <div className="contact-card">
-                <h3>Réservations & dépôt</h3>
+                <h3>Avant votre venue</h3>
                 <p style={{ margin: 0, color: 'var(--muted)', lineHeight: 1.8 }}>
-                  Après confirmation, un lien d’acompte sécurisé vous est transmis. Le solde est à régler sur place par carte ou espèces.
-                  Besoin d’un devis entreprise ? Envoyez-nous vos contraintes (nombre de joueurs, durée, traiteur) pour une réponse sous 24h.
-                  <span>PaintballTop</span>
-                  <span>Chemin des Arènes</span>
-                  <span>34920 Le Crès</span>
-                  <a href="tel:+33400000000">+33 4 00 00 00 00</a>
-                  <a href="mailto:contact@paintballtop.fr">contact@paintballtop.fr</a>
-                </address>
+                  Merci d’arriver 5 minutes avant l’heure de rendez-vous pour l’équipement. Sessions à partir de 8 joueurs, les places manquantes sont facturées 25 € / personne.
+                </p>
               </div>
               <div className="contact-card">
-                <h3>Horaires d’ouverture</h3>
-                <address>
-                  <span>Du lundi au dimanche</span>
-                  <span>09h00 — 19h00 sur réservation</span>
-                  <span>Nocturnes privées sur devis</span>
-                </address>
-              </div>
-              <div className="contact-card">
-                <h3>Préparez votre venue</h3>
+                <h3>Acompte & règlement</h3>
                 <p style={{ margin: 0, color: 'var(--muted)', lineHeight: 1.8 }}>
-                  Prévoyez une tenue confortable, des chaussures fermées et une bouteille d’eau. Des vestiaires sont à votre disposition
-                  pour vous changer avant et après la session.
+                  Déposez votre acompte sécurisé en ligne :
+                  {' '}
+                  <a href="https://www.paintballmediterranee.com/produit.php?id_prod=1" target="_blank" rel="noopener noreferrer">
+                    https://www.paintballmediterranee.com/produit.php?id_prod=1
+                  </a>
+                  . Il vous sera restitué sur place le jour J.
                 </p>
               </div>
             </div>
@@ -613,19 +540,12 @@ export default function HomePage() {
       <footer className="footer">
         <div className="footer__inner">
           <p>
-            © {new Date().getFullYear()} Paintball Méditerranée. Tous droits réservés — Siret fictif 000 000 000 00000 — activités de loisirs sportifs.
+            © {new Date().getFullYear()} Paintball Méditerranée Montpellier. Tous droits réservés — Loisirs paintball & gellyball.
           </p>
           <div className="footer__links">
             <a href="#faq">Questions fréquentes</a>
-            <a href="mailto:contact@paintball-med.com">Nous écrire</a>
+            <a href="mailto:contact@paintballmediterranee.com">Nous écrire</a>
             <a href="#reservation">Réserver</a>
-            © {new Date().getFullYear()} PaintballTop. Tous droits réservés. Siret fictif 000 000 000 00000 — activités de loisirs
-            sportifs encadrés.
-          </p>
-          <div className="footer__links">
-            <a href="#faq">Questions fréquentes</a>
-            <a href="mailto:contact@paintballtop.fr">Nous écrire</a>
-            <a href="#tarifs">Nos formules</a>
           </div>
         </div>
       </footer>
