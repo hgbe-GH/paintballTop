@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build static site
+      - name: Build static site (generates out/)
         run: npm run build
 
       - name: Upload Pages artifact
