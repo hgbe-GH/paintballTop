@@ -194,6 +194,8 @@ export default function HomePage() {
           </nav>
           <a className="navbar__cta" href="tel:+33623735002">
             Appeler Tommy
+          <a className="navbar__cta" href="#reservation">
+            Réserver
           </a>
         </div>
       </header>

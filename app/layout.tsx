@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 const siteUrl = 'https://paintballtop.github.io/paintballTop/';
+const siteUrl = 'https://paintballtop.github.io/paintballTop';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

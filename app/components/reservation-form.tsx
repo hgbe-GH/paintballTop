@@ -6,6 +6,9 @@ import { useMemo, useState } from 'react';
 const EMAIL = 'contact@paintballmediterranee.com';
 const MIN_PLAYERS = 8;
 const MAX_PLAYERS = 40;
+const EMAIL = 'contact@paintball-med.com';
+const MIN_PLAYERS = 4;
+const MAX_PLAYERS = 24;
 type Slot = 'matin' | 'apres-midi' | 'nocturne';
 
 const emailPattern = /^(?:[A-Za-z0-9_'^&+\-])+(?:\.(?:[A-Za-z0-9_'^&+\-])+)*@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}$/;
@@ -77,15 +80,13 @@ export function ReservationForm() {
           : 'Nocturne (sur devis)';
 
     const emailBody = [
-      'Bonjour Tommy,',
+      'Bonjour Paintball Méditerranée,',
       '',
       `Je souhaite réserver une session pour ${teamSize} joueurs le ${humanDate}.`,
       `Créneau préféré : ${slotLabel}.`,
       '',
       'Précisions :',
       notes ? notes : '— À compléter —',
-      '',
-      'Après validation, nous déposerons l’acompte sur https://www.paintballmediterranee.com/produit.php?id_prod=1.',
       '',
       'Merci pour votre retour !',
     ].join('\n');
@@ -99,6 +100,7 @@ export function ReservationForm() {
       type: 'success',
       message:
         'Votre messagerie s’ouvre avec le récapitulatif. Après confirmation, déposez votre acompte pour garantir le créneau.',
+        'Votre messagerie va s’ouvrir avec un récapitulatif. Nous vous confirmons le créneau sous 24h ouvrées.',
     });
     resetForm();
   };
