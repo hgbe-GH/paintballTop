@@ -40,14 +40,6 @@ cp .env.example .env
 
 > ℹ️ Pour `GOOGLE_SERVICE_ACCOUNT_KEY`, conservez les retours à la ligne (\n) si vous la stockez sur une seule ligne.
 
-## Lancer le serveur de développement
-
-```bash
-npm run dev
-```
-
-Le site est alors accessible sur [http://localhost:3000](http://localhost:3000).
-
 ## Tests
 
 Les tests Playwright et Vitest sont configurés dans le projet. Consultez les dossiers `playwright` et `vitest.config.ts` pour plus d'informations.
