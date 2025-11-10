@@ -361,6 +361,44 @@ main {
   margin-right: 0.6rem;
 }
 
+.options-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.option-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.75rem;
+  border-radius: 1.5rem;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  box-shadow: var(--shadow-soft);
+}
+
+.option-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.option-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.option-card span {
+  align-self: flex-start;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .schedule {
   display: grid;
   gap: 1.5rem;
@@ -391,6 +429,25 @@ main {
 
 .schedule__card span {
   color: var(--muted);
+}
+
+.map-block {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.map-block iframe {
+  width: 100%;
+  height: 360px;
+  border: none;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.map-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .testimonials {
@@ -435,6 +492,89 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+.reservation-form {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background: var(--surface);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: var(--shadow-soft);
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.form-field {
+  display: grid;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.form-field span {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  border-radius: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: 2px solid rgba(56, 189, 248, 0.5);
+  outline-offset: 2px;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 160px;
+}
+
+.form-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.form-feedback {
+  margin: 0;
+  font-size: 0.95rem;
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.form-feedback--success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #bbf7d0;
+}
+
+.form-feedback--error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fecaca;
 }
 
 .faq {
