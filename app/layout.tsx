@@ -1,9 +1,69 @@
+import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
+
+const siteUrl = 'https://paintballtop.github.io/paintballTop';
 
 export const metadata: Metadata = {
-  title: 'PaintballTop',
-  description: 'Préparez votre prochaine aventure paintball avec PaintballTop.'
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'PaintballTop | Terrain de paintball & événements sur mesure',
+    template: '%s | PaintballTop',
+  },
+  description:
+    'Vivez une aventure paintball immersive à PaintballTop : scénarios tactiques, formules adaptées aux groupes et réservations rapides pour les particuliers et entreprises.',
+  keywords: [
+    'paintball',
+    'paintball méditerranée',
+    'terrain paintball',
+    'anniversaire paintball',
+    'team building paintball',
+    'loisirs outdoor',
+    'paintball herault',
+  ],
+  authors: [{ name: 'PaintballTop' }],
+  creator: 'PaintballTop',
+  publisher: 'PaintballTop',
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: siteUrl,
+    title: 'PaintballTop | Terrain de paintball & événements sur mesure',
+    description:
+      'Réservez votre session paintball en Méditerranée : packages clé en main, encadrement professionnel et animations personnalisées.',
+    siteName: 'PaintballTop',
+    images: [
+      {
+        url: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80',
+        width: 1200,
+        height: 630,
+        alt: 'Équipe de paintball en pleine action sur le terrain PaintballTop',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@paintballtop',
+    creator: '@paintballtop',
+    title: 'PaintballTop | Expériences paintball immersives',
+    description:
+      'Préparez votre session paintball : disponibilité en ligne, forfaits adaptés et conseils d’experts pour un événement inoubliable.',
+    images: ['https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80'],
+  },
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -13,7 +73,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body style={{ margin: 0, minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc' }}>
+      <body className={inter.className}>
+        <a className="skip-link" href="#contenu-principal">
+          Passer au contenu principal
+        </a>
         {children}
       </body>
     </html>
