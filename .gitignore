@@ -1,0 +1,26 @@
+# Node dependencies
+node_modules/
+paintball-site/node_modules/
+
+# Next.js build output
+.next/
+paintball-site/.next/
+
+# Static export output
+out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Misc
+.DS_Store
+.idea/
+.vscode/
